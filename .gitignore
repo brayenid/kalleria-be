@@ -1,3 +1,8 @@
 node_modules
 .env
-src/public/uploads/*
+src/public/uploads/**/*.jpg
+src/public/uploads/**/*.JPG
+src/public/uploads/**/*.jpeg
+src/public/uploads/**/*.JPEG
+src/public/uploads/**/*.png
+src/public/uploads/**/*.PNG

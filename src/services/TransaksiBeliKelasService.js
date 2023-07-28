@@ -123,7 +123,23 @@ class TransaksiBeliKelasService {
       }
       return true
     } catch (error) {
-      throw Error('Validasi gagal')
+      throw Error(`Gagal melakukan validasi owner transaksi: ${error.message}`)
+    }
+  }
+
+  async validateTransaksiUserAvailability(userId, kelasId) {
+    try {
+      const query = {
+        text: "SELECT * FROM transaksi_beli_kelas WHERE user_id = $1 AND kelas_id = $2 AND status != 'ditolak'",
+        values: [userId, kelasId]
+      }
+
+      const { rowCount } = await this._pool.query(query)
+      if (rowCount) {
+        throw new Error(`Transaksi atas ${userId} terhadap ${kelasId} sedang berlangsung/telah berhasil, dapat mengirim kembali jika status transaksi ditolak `)
+      }
+    } catch (error) {
+      throw new Error(`Gagal melakukan transaksi: ${error.message}`)
     }
   }
 

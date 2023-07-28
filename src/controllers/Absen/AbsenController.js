@@ -30,6 +30,8 @@ class AbsenController {
     try {
       await this.kelasUserService.validateKelasUser(userId, kelasId)
       await this.kelasUserService.validatePresensiNotExceeded(userId, kelasId, jumlahPertemuan)
+      await this.service.validateUserTodaysPresensi(kelasId, userId)
+
       const { namaUser, namaKelas } = await this.service.addAbsen(absenPayload)
       await this.kelasUserService.patchKelasUserPresensi(kelasUserPayload, jumlahPertemuan)
 

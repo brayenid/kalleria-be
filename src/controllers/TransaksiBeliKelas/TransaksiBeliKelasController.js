@@ -23,6 +23,8 @@ class TransaksiBeliKelasController {
         throw new Error('Gagal menambahkan transaksi: Kelas tidak tersedia')
       }
 
+      await this.service.validateTransaksiUserAvailability(userId, kelasId)
+
       const payload = {
         id,
         userId,
@@ -86,6 +88,11 @@ class TransaksiBeliKelasController {
         adminId,
         message,
         status
+      }
+
+      const isTransaksiAvailable = await this.service.getTransaksiById(idTransaksi)
+      if (!isTransaksiAvailable) {
+        throw new Error('Gagal merubah status: Transaksi tidak valid')
       }
 
       const { kelasId, userId } = await this.service.putStatusTransakasi(idTransaksi, payload)

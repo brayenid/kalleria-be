@@ -70,6 +70,38 @@ class AbsenService {
       throw new Error(`Gagal mendapatkan absen berdasarkan kelas: ${error.message}`)
     }
   }
+
+  async validateUserTodaysPresensi(kelasId, userId) {
+    const date = new Date()
+    const year = date.getUTCFullYear()
+    const month = (date.getUTCMonth() + 1).toString().padStart(2, '0')
+    const day = date.getDate().toString().padStart(2, '0')
+    const currentDate = `${year}-${month}-${day}`
+
+    try {
+      const query = {
+        text: `
+        SELECT
+        id,
+        user_id AS "userId",
+        kelas_id AS "kelasId",
+        jumlah_pertemuan AS "jumlahPertemuan",
+        created_at AS "tanggal",
+        admin
+        FROM absen
+        WHERE kelas_id = $1 AND user_id = $2 AND DATE(created_at) = $3
+        `,
+        values: [kelasId, userId, currentDate]
+      }
+
+      const { rowCount } = await this._pool.query(query)
+      if (rowCount) {
+        throw new Error('User telah absen hari ini')
+      }
+    } catch (error) {
+      throw new Error(`Gagal menambah absen: ${error.message}`)
+    }
+  }
 }
 
 module.exports = AbsenService

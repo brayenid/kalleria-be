@@ -2,18 +2,19 @@
 const transactions_status_enum = 'transactions_status_enum'
 
 exports.up = (pgm) => {
-  const transactions_values = ['pending', 'ditolak', 'diterima']
+  const transactions_values = ['pending', 'dibayar', 'ditolak', 'diterima']
   pgm.createType(transactions_status_enum, transactions_values)
 
   pgm.createTable('transaksi_beli_kelas', {
     id: {
-      type: 'VARCHAR(30)',
+      type: 'VARCHAR(50)',
       primaryKey: true
     },
     user_id: {
       type: 'VARCHAR(30)',
       references: '"users"',
-      onDelete: 'cascade'
+      onDelete: 'cascade',
+      notNull: true
     },
     kelas_id: {
       type: 'VARCHAR(30)',
@@ -26,12 +27,24 @@ exports.up = (pgm) => {
       default: 'pending',
       notNull: true
     },
-    admin: {
+    url_bukti_bayar: {
+      type: 'TEXT',
+      default: null
+    },
+    message: {
+      type: 'TEXT',
+      default: null
+    },
+    accepted_by: {
       type: 'VARCHAR(30)',
-      references: '"admins"',
-      onDelete: 'cascade'
+      default: null
     },
     created_at: {
+      type: 'TIMESTAMP',
+      notNull: true,
+      default: pgm.func('current_timestamp')
+    },
+    updated_at: {
       type: 'TIMESTAMP',
       notNull: true,
       default: pgm.func('current_timestamp')

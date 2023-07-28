@@ -1,6 +1,6 @@
 const fs = require('fs')
 
-exports.oldPhotosCleaner = (destinationPath, urlFoto) => {
+exports.oldPhotosCleaner = ({ destinationPath, urlFoto, photoDir }) => {
   fs.readdir(destinationPath, (err, files) => {
     if (err) {
       console.log(err)
@@ -21,12 +21,42 @@ exports.oldPhotosCleaner = (destinationPath, urlFoto) => {
 
     // UNLINK OLD PHOTOS
     photosExceptTheNewOne.forEach((file) => {
-      const pathToDelete = 'src/public/uploads/foto'
+      const pathToDelete = `src/public/uploads/${photoDir}`
       fs.unlink(`${pathToDelete}/${file}`, (err) => {
         if (err) {
           console.error(`Gagal menghapus file ${file}:`, err)
         }
       })
     })
+  })
+}
+
+exports.unamedThumbnailCleaner = (destinationPath, photoDir) => {
+  fs.readdir(destinationPath, (err, files) => {
+    if (err) {
+      console.error(err)
+      return
+    }
+    const unamedFile = 'thumbnailKelas_unamed-class'
+
+    const getUnamedThumbnail = files.filter((file) => file.includes(unamedFile))
+
+    getUnamedThumbnail.forEach((file) => {
+      const pathToDelete = `src/public/uploads/${photoDir}`
+      fs.unlink(`${pathToDelete}/${file}`, (err) => {
+        if (err) {
+          console.error(`Gagal menghapus file ${file}:`, err)
+        }
+      })
+    })
+  })
+}
+
+exports.deletePhotoByPath = (filepath) => {
+  const photoToDelete = `src/public/${filepath}`
+  fs.unlink(photoToDelete, (err) => {
+    if (err) {
+      console.error(`Gagal menghapus file ${filepath}:`, err)
+    }
   })
 }

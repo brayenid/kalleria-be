@@ -2,7 +2,7 @@ const bcrypt = require('bcrypt')
 const { nanoid } = require('nanoid')
 const autoBind = require('auto-bind')
 const path = require('path')
-const { oldPhotosCleaner } = require('../../utils/OldPhotosCleaner')
+const { oldPhotosCleaner } = require('../../utils/PhotosCleaner')
 
 class UserController {
   constructor(service) {
@@ -12,28 +12,31 @@ class UserController {
   }
 
   async addUser(req, res) {
-    const { username, nama, email, noTelepon, password, pekerjaan, noIdentitas, urlFoto } = req.body
+    const { username, nama, noIdentitas, jenisKelamin, tempatLahir, tanggalLahir, alamat, email, noTelepon, password, asalSekolah } = req.body
     const usernameReplace = username.trim().replace(/\s/g, '')
     const payload = {
       id: `user-${nanoid(12)}`,
       username: usernameReplace,
       nama,
+      noIdentitas,
+      jenisKelamin,
+      tempatLahir,
+      tanggalLahir,
+      alamat,
       email,
       noTelepon,
-      pekerjaan,
-      noIdentitas,
-      urlFoto,
+      asalSekolah,
       password: await bcrypt.hash(password, 10)
     }
     try {
       await this.service.addAccount(payload)
 
-      res.status(201).json({
+      return res.status(201).json({
         status: 'success',
-        message: 'Account created successfully.'
+        message: 'Akun berhasil dibuat.'
       })
     } catch (error) {
-      res.status(400).json({
+      return res.status(400).json({
         status: 'fail',
         message: error.message
       })
@@ -45,24 +48,25 @@ class UserController {
     try {
       const getUrlPath = (fullPath) => fullPath.path.split('\\').splice(6, 9).join('/')
 
-      const { nama, email, noTelepon, pekerjaan, noIdentitas } = req.body
-      const { url_foto } = await this.service.getAccountById(id)
+      const { nama, alamat, email, noTelepon, asalSekolah, noIdentitas } = req.body
       let urlFoto
       if (req.file) {
         urlFoto = getUrlPath(req.file)
         const destinationPath = path.resolve(__dirname, '..', '..', 'public', 'uploads', 'foto')
 
         // HANDLE DUPLICATE USER's PHOTO AFTER UPDATE //
-        oldPhotosCleaner(destinationPath, urlFoto)
+        oldPhotosCleaner({ destinationPath, urlFoto, photoDir: 'foto' })
       } else {
+        const { url_foto } = await this.service.getAccountById(id)
         urlFoto = url_foto
       }
 
       const payload = {
         nama,
+        alamat,
         email,
         noTelepon,
-        pekerjaan,
+        asalSekolah,
         noIdentitas,
         urlFoto
       }
@@ -135,19 +139,27 @@ class UserController {
   }
 
   async getUserById(req, res) {
-    const { id } = req.params
-    const isAuthorized = () => {
-      if (id === req.user.id || req.user.role === 'admin') {
-        return true
-      }
-      return false
-    }
+    const { id } = req.user
 
     try {
-      if (!isAuthorized()) {
-        throw new Error('You are unauthorized')
-      }
+      const data = await this.service.getAccountById(id)
 
+      return res.status(200).json({
+        status: 'success',
+        data
+      })
+    } catch (error) {
+      return res.status(403).json({
+        status: 'fail',
+        message: error.message
+      })
+    }
+  }
+
+  async getUserByParamsId(req, res) {
+    const { id } = req.params
+
+    try {
       const data = await this.service.getAccountById(id)
 
       return res.status(200).json({

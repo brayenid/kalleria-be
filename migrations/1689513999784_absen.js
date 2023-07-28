@@ -3,7 +3,7 @@
 exports.up = (pgm) => {
   pgm.createTable('absen', {
     id: {
-      type: 'VARCHAR(30)',
+      type: 'VARCHAR(50)',
       primaryKey: true
     },
     user_id: {
@@ -11,17 +11,13 @@ exports.up = (pgm) => {
       references: '"users"',
       notNull: true
     },
-    kelas_user_id: {
+    kelas_id: {
       type: 'VARCHAR(30)',
-      references: '"kelas_users"',
+      references: '"kelas"',
       notNull: true
     },
     jumlah_pertemuan: {
       type: 'INTEGER',
-      notNull: true
-    },
-    tanggal: {
-      type: 'TEXT',
       notNull: true
     },
     admin: {

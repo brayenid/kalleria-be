@@ -103,19 +103,27 @@ class AdminControllers {
   }
 
   async getAdminById(req, res) {
-    const { id } = req.params
-    const isAuthorized = () => {
-      if (id === req.user.id || req.user.role === 'sudo') {
-        return true
-      }
-      return false
-    }
+    const { id } = req.user
 
     try {
-      if (!isAuthorized()) {
-        throw new Error('You are unauthorized')
-      }
+      const data = await this.service.getAccountById(id)
 
+      return res.status(200).json({
+        status: 'success',
+        data
+      })
+    } catch (error) {
+      return res.status(403).json({
+        status: 'fail',
+        message: error.message
+      })
+    }
+  }
+
+  async getAdminByParamsId(req, res) {
+    const { id } = req.params
+
+    try {
       const data = await this.service.getAccountById(id)
 
       return res.status(200).json({

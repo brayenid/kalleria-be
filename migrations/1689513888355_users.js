@@ -1,6 +1,10 @@
 /* eslint-disable */
 
+const gender_enum = 'gender_enum'
 exports.up = (pgm) => {
+  const gender_values = ['laki-laki', 'perempuan']
+  pgm.createType(gender_enum, gender_values)
+
   pgm.createTable('users', {
     id: {
       type: 'VARCHAR(30)',
@@ -12,6 +16,26 @@ exports.up = (pgm) => {
       notNull: true
     },
     nama: {
+      type: 'TEXT',
+      notNull: true
+    },
+    no_identitas: {
+      type: 'TEXT',
+      notNull: true
+    },
+    jenis_kelamin: {
+      type: gender_enum,
+      notNull: true
+    },
+    tempat_lahir: {
+      type: 'TEXT',
+      notNull: true
+    },
+    tanggal_lahir: {
+      type: 'TEXT',
+      notNull: true
+    },
+    alamat: {
       type: 'TEXT',
       notNull: true
     },
@@ -27,11 +51,7 @@ exports.up = (pgm) => {
       type: 'TEXT',
       notNull: true
     },
-    pekerjaan: {
-      type: 'TEXT',
-      notNull: true
-    },
-    no_identitas: {
+    asal_sekolah: {
       type: 'TEXT',
       notNull: true
     },
@@ -58,4 +78,5 @@ exports.up = (pgm) => {
 
 exports.down = (pgm) => {
   pgm.dropTable('users')
+  pgm.dropType(gender_enum)
 }

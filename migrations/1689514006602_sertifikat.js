@@ -3,7 +3,7 @@
 exports.up = (pgm) => {
   pgm.createTable('sertifikat', {
     id: {
-      type: 'VARCHAR(30)',
+      type: 'VARCHAR(50)',
       primaryKey: true
     },
     kelas_id: {

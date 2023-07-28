@@ -20,6 +20,13 @@ app.use(express.static(path.join(__dirname, 'public')))
 
 app.use('/', router)
 
+app.use((req, res) => {
+  res.status(404).json({
+    status: 'fail',
+    message: 'Anda salah alamat, endpoint ini tidak ada'
+  })
+})
+
 app.listen(config.server.port, () => {
   console.info(`Server is running on http://localhost:${config.server.port}`)
 })

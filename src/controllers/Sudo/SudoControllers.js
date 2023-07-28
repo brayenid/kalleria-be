@@ -52,6 +52,22 @@ class SudoController {
       })
     }
   }
+
+  async getAccountById(req, res) {
+    const { id } = req.user
+    try {
+      const data = await this.service.getAccountById(id)
+      return res.status(200).json({
+        status: 'success',
+        data
+      })
+    } catch (error) {
+      return res.status(400).json({
+        status: 'fail',
+        message: error.message
+      })
+    }
+  }
 }
 
 module.exports = SudoController

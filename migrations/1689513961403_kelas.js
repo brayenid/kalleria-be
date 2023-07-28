@@ -14,6 +14,10 @@ exports.up = (pgm) => {
       type: 'INTEGER',
       notNull: true
     },
+    tipe_kelas: {
+      type: 'TEXT',
+      notNull: true
+    },
     deskripsi_kelas: {
       type: 'TEXT',
       notNull: true

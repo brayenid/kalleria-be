@@ -76,7 +76,7 @@ class AdminService extends AccountService {
 
   async getAccountById(id) {
     const query = {
-      text: 'SELECT id, username, nama FROM admins WHERE id = $1',
+      text: 'SELECT id, username, nama, created_at AS "createdAt", updated_at AS "updatedAt" FROM admins WHERE id = $1',
       values: [id]
     }
     const { rowCount, rows } = await this._pool.query(query)

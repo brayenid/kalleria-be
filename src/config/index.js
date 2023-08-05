@@ -9,7 +9,8 @@ const config = {
     refresh: process.env.REFRESH_TOKEN_KEY
   },
   cookies: {
-    secret: process.env.SIGNED_COOKIE
+    secret: process.env.SIGNED_COOKIE,
+    age: 7 * 24 * 60 * 60 * 1000 // 7days
   },
   sudo: {
     username: process.env.SUDO_USERNAME,

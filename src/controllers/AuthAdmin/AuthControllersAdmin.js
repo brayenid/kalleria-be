@@ -1,6 +1,7 @@
 const autoBind = require('auto-bind')
 const AuthController = require('../../interfaces/controllers/AuthControllers')
 const TokenManager = require('../../utils/TokenManager')
+const config = require('../../config')
 
 class AuthControllersAdmin extends AuthController {
   constructor(adminService, authService) {
@@ -30,7 +31,12 @@ class AuthControllersAdmin extends AuthController {
         .cookie('refreshTokenAdmin', refreshToken, {
           domain: 'localhost',
           httpOnly: true,
-          signed: true
+          signed: true,
+          maxAge: config.cookies.age
+        })
+        .cookie('role', 'admin', {
+          domain: 'localhost',
+          maxAge: config.cookies.age
         })
         .json({
           status: 'success',
@@ -77,7 +83,7 @@ class AuthControllersAdmin extends AuthController {
       await this.authService.verifyRefreshToken(refreshTokenAdmin)
       await this.authService.deleteRefreshToken(refreshTokenAdmin)
 
-      return res.status(200).clearCookie('refreshTokenAdmin').json({
+      return res.status(200).clearCookie('refreshTokenAdmin').clearCookie('role').json({
         status: 'success',
         message: 'Anda berhasil keluar'
       })

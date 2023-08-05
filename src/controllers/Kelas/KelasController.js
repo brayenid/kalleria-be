@@ -1,7 +1,7 @@
 const autoBind = require('auto-bind')
 const { nanoid } = require('nanoid')
 const path = require('path')
-const { oldPhotosCleaner, unamedThumbnailCleaner, deletePhotoByPath } = require('../../utils/PhotosCleaner')
+const { unamedThumbnailCleaner, deletePhotoByPath } = require('../../utils/PhotosCleaner')
 
 class KelasController {
   constructor(service) {
@@ -12,15 +12,16 @@ class KelasController {
 
   async addKelas(req, res) {
     const { namaKelas, tipeKelas, hargaKelas, deskripsiKelas } = req.body
+    const getUrlPath = (fullPath) => fullPath.path.split('\\').splice(6, 9).join('/')
+    const thumbnailKelas = getUrlPath(req.file)
+
     try {
       const id = `kelas-${nanoid(10)}`
-      const getUrlPath = (fullPath) => fullPath.path.split('\\').splice(6, 9).join('/')
 
-      const thumbnailKelas = getUrlPath(req.file)
       const destinationPath = path.resolve(__dirname, '..', '..', 'public', 'uploads', 'kelas')
 
       // HANDLE DUPLICATE/UNAMED THUMBNAIL PHOTO AFTER UPDATE //
-      oldPhotosCleaner({ destinationPath, urlFoto: thumbnailKelas, photoDir: 'kelas' })
+      // oldPhotosCleaner({ destinationPath, urlFoto: thumbnailKelas, photoDir: 'kelas' })
       unamedThumbnailCleaner(destinationPath, 'kelas')
 
       const payload = {
@@ -39,6 +40,9 @@ class KelasController {
         message: 'Kelas berhasil ditambahkan'
       })
     } catch (error) {
+      if (req.file) {
+        deletePhotoByPath(thumbnailKelas)
+      }
       return res.status(400).json({
         status: 'fail',
         message: error.message
@@ -50,8 +54,8 @@ class KelasController {
     const { namaKelas, tipeKelas, hargaKelas, deskripsiKelas } = req.body
     const { id } = req.params
     try {
-      const { thumbnail_kelas } = await this.service.getKelasById(id)
-      if (!thumbnail_kelas) {
+      const { thumbnailKelas } = await this.service.getKelasById(id)
+      if (!thumbnailKelas) {
         throw new Error('Kelas tidak ditemukan')
       }
       const getUrlPath = (fullPath) => fullPath.path.split('\\').splice(6, 9).join('/')
@@ -62,10 +66,10 @@ class KelasController {
         const destinationPath = path.resolve(__dirname, '..', '..', 'public', 'uploads', 'kelas')
 
         // HANDLE DUPLICATE USER's PHOTO AFTER UPDATE //
-        oldPhotosCleaner({ destinationPath, urlFoto: urlThumbnail, photoDir: 'kelas' })
+        // oldPhotosCleaner({ destinationPath, urlFoto: urlThumbnail, photoDir: 'kelas' })
         unamedThumbnailCleaner(destinationPath, 'kelas')
       } else {
-        urlThumbnail = thumbnail_kelas
+        urlThumbnail = thumbnailKelas
       }
 
       const payload = {

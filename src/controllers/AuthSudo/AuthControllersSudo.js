@@ -1,6 +1,7 @@
 const autoBind = require('auto-bind')
 const AuthController = require('../../interfaces/controllers/AuthControllers')
 const TokenManager = require('../../utils/TokenManager')
+const config = require('../../config')
 
 class AuthControllersAdmin extends AuthController {
   constructor(sudoService, authService) {
@@ -30,7 +31,12 @@ class AuthControllersAdmin extends AuthController {
         .cookie('refreshTokenSudo', refreshToken, {
           domain: 'localhost',
           httpOnly: true,
-          signed: true
+          signed: true,
+          maxAge: config.cookies.age
+        })
+        .cookie('role', 'sudo', {
+          domain: 'localhost',
+          maxAge: config.cookies.age
         })
         .json({
           status: 'success',
@@ -77,7 +83,7 @@ class AuthControllersAdmin extends AuthController {
       await this.authService.verifyRefreshToken(refreshTokenSudo)
       await this.authService.deleteRefreshToken(refreshTokenSudo)
 
-      return res.status(200).clearCookie('refreshTokenSudo').json({
+      return res.status(200).clearCookie('refreshTokenSudo').clearCookie('role').json({
         status: 'success',
         message: 'Anda berhasil keluar'
       })

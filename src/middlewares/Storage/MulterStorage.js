@@ -50,12 +50,13 @@ const storageBuktiBayarKelas = multer.diskStorage({
   },
 
   filename: (req, file, cb) => {
-    const { id } = req.user
+    const transaksiId = req.params.idTransaksi.split('-')[1]
+    const { id: userId } = req.user
     const getIndexLength = file.originalname.split('.').length
     const fileExt = file.originalname.split('.')[getIndexLength - 1]
 
     const curretUnixTime = new Date().getTime()
-    cb(null, `${file.fieldname}_${id}_${curretUnixTime}.${fileExt}`)
+    cb(null, `${file.fieldname}_${userId}_${transaksiId}_${curretUnixTime}.${fileExt}`)
   }
 })
 

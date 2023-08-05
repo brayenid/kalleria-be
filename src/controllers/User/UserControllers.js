@@ -140,7 +140,6 @@ class UserController {
 
   async getUserById(req, res) {
     const { id } = req.user
-
     try {
       const data = await this.service.getAccountById(id)
 

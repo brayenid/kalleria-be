@@ -53,15 +53,36 @@ class KelasService {
     const offset = (pageNumber - 1) * pageSize
     try {
       const query = {
-        text: 'SELECT id, nama_kelas AS "namaKelas", tipe_kelas AS "tipeKelas", harga_kelas AS "hargaKelas", thumbnail_kelas AS "thumbnailKelas" FROM kelas LIMIT $1 OFFSET $2',
+        text: `
+        SELECT 
+        id, 
+        nama_kelas AS "namaKelas", 
+        tipe_kelas AS "tipeKelas", 
+        harga_kelas AS "hargaKelas", 
+        thumbnail_kelas AS "thumbnailKelas" 
+        FROM 
+        kelas
+        ORDER BY
+        updated_at DESC
+        LIMIT $1 OFFSET $2`,
         values: [pageSize, offset]
       }
       const { rows } = await this._pool.query(query)
-
-      return rows
+      const total = await this._getAllKelasTotal()
+      return {
+        total,
+        rows
+      }
     } catch (error) {
       throw new Error(`Gagal mendapatkan semua kelas: ${error.message}`)
     }
+  }
+
+  async _getAllKelasTotal() {
+    const query = 'SELECT COUNT(*) AS "totalKelas" FROM kelas'
+    const { rows } = await this._pool.query(query)
+
+    return Number(rows[0].totalKelas)
   }
 
   async getKelasById(id) {

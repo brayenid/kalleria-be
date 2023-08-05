@@ -94,6 +94,8 @@ router.get('/transaksi', validateAuthAdmin.validate, transaksiBeliKelasControlle
 router.get('/transaksi/detail/:transaksiId', validateAuthUser.validateLoose, transaksiBeliKelasController.getTransaksiById)
 router.get('/transaksi/user', validateAuthUser.validateStrict, transaksiBeliKelasController.getTransaksiByUserIdUser)
 router.get('/transaksi/user/:id', validateAuthAdmin.validate, transaksiBeliKelasController.getTransaksiByUserIdAdminSudo)
+router.get('/transaksi/kelas/:kelasId', validateAuthUser.validateStrict, transaksiBeliKelasController.getTransaksiByKelasAndUser)
+router.get('/transaksi/notify', validateAuthUser.validateStrict, transaksiBeliKelasController.getPendingOrDitolakStatusLeft)
 
 // KELAS USERS ROUTES
 router.put('/kelasuser/:id', validateAuthAdmin.validate, putKelasUserValidator, kelasUsersController.putKelasUser)

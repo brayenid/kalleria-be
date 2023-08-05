@@ -9,13 +9,17 @@ const path = require('path')
 
 app.use(
   cors({
-    origin: ['*'],
+    origin: ['http://localhost:5173'],
     credentials: true
   })
 )
 app.use(cookieParser(config.cookies.secret))
 app.use(express.json())
-app.use(helmet())
+app.use(
+  helmet({
+    crossOriginResourcePolicy: false
+  })
+)
 app.use(express.static(path.join(__dirname, 'public')))
 
 app.use('/', router)

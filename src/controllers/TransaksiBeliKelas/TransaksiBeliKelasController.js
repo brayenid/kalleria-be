@@ -1,7 +1,6 @@
 const autoBind = require('auto-bind')
 const { nanoid } = require('nanoid')
-const { oldPhotosCleaner } = require('../../utils/PhotosCleaner')
-const path = require('path')
+const { deletePhotoByPath } = require('../../utils/PhotosCleaner')
 
 class TransaksiBeliKelasController {
   constructor(service, kelasService, kelasUsersService) {
@@ -46,6 +45,15 @@ class TransaksiBeliKelasController {
 
   async patchBuktiBayarTransaksi(req, res) {
     const { idTransaksi } = req.params
+    if (!req.file) {
+      return res.status(400).json({
+        status: 'fail',
+        message: 'Berkas bukti pembayaran harus diunggah.'
+      })
+    }
+    const getUrlPath = (fullPath) => fullPath.path.split('\\').splice(6, 9).join('/')
+    const urlBuktiBayar = getUrlPath(req.file)
+
     try {
       const isTransaksiBeliKelasAvailable = await this.service.getTransaksiById(idTransaksi)
       if (!isTransaksiBeliKelasAvailable) {
@@ -58,19 +66,14 @@ class TransaksiBeliKelasController {
         throw new Error('Gagal menambahkan bukti transaksi: Anda telah mengirimkan bukti dan diterima')
       }
 
-      const getUrlPath = (fullPath) => fullPath.path.split('\\').splice(6, 9).join('/')
-
-      const urlBuktiBayar = getUrlPath(req.file)
       await this.service.patchBuktiTransaksi(idTransaksi, urlBuktiBayar)
-
-      const destinationPath = path.resolve(__dirname, '..', '..', 'public', 'uploads', 'transaksi')
-      oldPhotosCleaner({ destinationPath, urlFoto: urlBuktiBayar, photoDir: 'transaksi' })
 
       return res.status(200).json({
         status: 'success',
         message: 'Bukti pembayaran telah dikirim, mengunggu konfirmasi admin'
       })
     } catch (error) {
+      deletePhotoByPath(urlBuktiBayar)
       return res.status(400).json({
         status: 'fail',
         message: error.message
@@ -125,9 +128,9 @@ class TransaksiBeliKelasController {
   }
 
   async getAllTransaksi(req, res) {
-    const { pageNumber, pageSize, status } = req.query
+    const { pageNumber, pageSize, status, search } = req.query
     try {
-      const response = await this.service.getAllTransaksi(pageNumber, pageSize, status)
+      const response = await this.service.getAllTransaksi(pageNumber, pageSize, status, search)
 
       return res.status(200).json({
         status: 'success',
@@ -183,12 +186,49 @@ class TransaksiBeliKelasController {
     }
   }
 
+  async getTransaksiByKelasAndUser(req, res) {
+    const { id: userId } = req.user
+    const { kelasId } = req.params
+
+    try {
+      const response = await this.service.getTransaksiByKelasAndUser(userId, kelasId)
+
+      return res.status(200).json({
+        status: 'success',
+        data: response
+      })
+    } catch (error) {
+      return res.status(400).json({
+        status: 'fail',
+        message: error.message
+      })
+    }
+  }
+
   async getTransaksiByUserIdAdminSudo(req, res) {
     const { id: userId } = req.params
     const { pageNumber, pageSize } = req.query
 
     try {
       const response = await this.service.getAllTransaksiByUserId(userId, pageNumber, pageSize)
+
+      return res.status(200).json({
+        status: 'success',
+        data: response
+      })
+    } catch (error) {
+      return res.status(400).json({
+        status: 'fail',
+        message: error.message
+      })
+    }
+  }
+
+  async getPendingOrDitolakStatusLeft(req, res) {
+    const { id: userId } = req.user
+
+    try {
+      const response = await this.service.getPendingOrDitolakStatusLeft(userId)
 
       return res.status(200).json({
         status: 'success',

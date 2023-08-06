@@ -97,12 +97,12 @@ class KelasController {
   async deleteKelas(req, res) {
     const { id } = req.params
     try {
-      const { thumbnail_kelas } = await this.service.getKelasById(id)
-      if (!thumbnail_kelas) {
+      const { thumbnailKelas } = await this.service.getKelasById(id)
+      if (!thumbnailKelas) {
         throw new Error('Kelas tidak ditemukan')
       }
       await this.service.removeKelas(id)
-      deletePhotoByPath(thumbnail_kelas)
+      deletePhotoByPath(thumbnailKelas)
 
       return res.status(200).json({
         status: 'success',
@@ -125,7 +125,7 @@ class KelasController {
         data
       })
     } catch (error) {
-      return res.statu(400).json({
+      return res.status(400).json({
         status: 'fail',
         message: error.message
       })

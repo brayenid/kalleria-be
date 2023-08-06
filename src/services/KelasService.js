@@ -88,7 +88,16 @@ class KelasService {
   async getKelasById(id) {
     try {
       const query = {
-        text: 'SELECT id, nama_kelas AS "namaKelas", tipe_kelas AS "tipeKelas", harga_kelas AS "hargaKelas", thumbnail_kelas AS "thumbnailKelas", deskripsi_kelas AS "deskripsiKelas" FROM kelas WHERE id = $1',
+        text: `
+        SELECT 
+        id, 
+        nama_kelas AS "namaKelas", 
+        tipe_kelas AS "tipeKelas", 
+        harga_kelas AS "hargaKelas", 
+        thumbnail_kelas AS "thumbnailKelas", 
+        deskripsi_kelas AS "deskripsiKelas",
+        updated_at AS "updatedAt" 
+        FROM kelas WHERE id = $1`,
         values: [id]
       }
       const { rows } = await this._pool.query(query)

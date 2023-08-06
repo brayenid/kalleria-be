@@ -125,12 +125,14 @@ class UserController {
 
   async getUsers(req, res) {
     try {
-      const response = await this.service.getAccounts()
+      const { pageNumber, pageSize, search } = req.query
+      const response = await this.service.getAccounts(pageNumber, pageSize, search)
       return res.status(200).json({
         status: 'success',
-        data: [...response]
+        data: response
       })
     } catch (error) {
+      console.log(error.message)
       return res.status(500).json({
         status: 'fail',
         message: 'server error'

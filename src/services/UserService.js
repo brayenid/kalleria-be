@@ -65,12 +65,47 @@ class UserService extends AccountService {
     }
   }
 
-  async getAccounts() {
+  async getAccounts(pageNumber = 1, pageSize = 20, searchQuery = '') {
+    const offset = (pageNumber - 1) * pageSize
     try {
-      const { rows } = await this._pool.query('SELECT id, username, nama, email, no_telepon AS "noTelepon", asal_sekolah AS "asalSekolah" FROM users')
-      return rows
+      const query = {
+        text: `
+        SELECT id, 
+        username, 
+        nama, 
+        email, 
+        no_telepon AS "noTelepon", 
+        asal_sekolah AS "asalSekolah",
+        created_at AS "createdAt"
+        FROM users
+        WHERE nama ILIKE $3 OR username ILIKE $3 OR id ILIKE $3
+        ORDER BY
+        updated_at DESC
+        LIMIT $1 OFFSET $2
+        `,
+        values: [pageSize, offset, `%${searchQuery}%`]
+      }
+      const total = await this._getAccountsTotal(searchQuery)
+      const { rows } = await this._pool.query(query)
+      return {
+        total,
+        rows
+      }
     } catch (error) {
       throw new Error(`Gagal mendapatkan semua akun: ${error.message}`)
+    }
+  }
+
+  async _getAccountsTotal(searchQuery) {
+    try {
+      const query = {
+        text: 'SELECT COUNT(*) AS "totalUsers" FROM users WHERE nama ILIKE $1 OR username ILIKE $1 ',
+        values: [`%${searchQuery}%`]
+      }
+      const { rows } = await this._pool.query(query)
+      return Number(rows[0].totalUsers)
+    } catch (error) {
+      throw new Error(`Gagal mendapatkan total akun users: ${error.message}`)
     }
   }
 

@@ -5,7 +5,7 @@ const config = require('../config')
 const TokenManager = {
   generateAccessToken: (payload) => {
     return jwt.sign(payload, config.token.access, {
-      expiresIn: '10s'
+      expiresIn: '1d'
     })
   },
   generateRefreshToken: (payload) => {

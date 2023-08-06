@@ -235,7 +235,7 @@ class TransaksiBeliKelasService {
         ON transaksi_beli_kelas.kelas_id = kelas.id
         JOIN users
         ON transaksi_beli_kelas.user_id = users.id
-        WHERE users.nama ILIKE $3`,
+        WHERE users.nama ILIKE $3 OR users.username ILIKE $3 OR kelas.nama_kelas ILIKE $3`,
         values: [pageSize, offset, `%${search}%`]
       }
       if (status) {

@@ -29,7 +29,7 @@ class AuthControllersAdmin extends AuthController {
       res
         .status(200)
         .cookie('refreshTokenSudo', refreshToken, {
-          domain: 'lpk.kalleriagroup.com',
+          domain: '.kalleriagroup.com',
           httpOnly: true,
           signed: true,
           maxAge: config.cookies.age,

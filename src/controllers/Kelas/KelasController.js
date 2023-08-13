@@ -13,9 +13,9 @@ class KelasController {
 
   async addKelas(req, res) {
     const { namaKelas, tipeKelas, hargaKelas, deskripsiKelas } = req.body
-    const getUrlPath = (fullPath) => fullPath.path.split('\\').splice(6, 9).join('/')
+    const getUrlPath = (fullPath) => fullPath.path.split('/').splice(6, 9).join('/')
     const thumbnailKelas = getUrlPath(req.file)
-    logger.info(`no func = ${req.file.path.split('\\').splice(6, 9).join('/')}`)
+    logger.info(`no func = ${req.file.path.split('/').splice(6, 9).join('/')}`)
     logger.info(`with func = ${getUrlPath(req.file)}`)
 
     try {

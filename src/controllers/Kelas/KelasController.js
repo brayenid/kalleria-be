@@ -15,7 +15,8 @@ class KelasController {
     const { namaKelas, tipeKelas, hargaKelas, deskripsiKelas } = req.body
     const getUrlPath = (fullPath) => fullPath.path.split('\\').splice(6, 9).join('/')
     const thumbnailKelas = getUrlPath(req.file)
-    logger.info(req.file.path)
+    logger.info(`no func = ${req.file.path.split('\\').splice(6, 9).join('/')}`)
+    logger.info(`with func = ${getUrlPath(req.file)}`)
 
     try {
       const id = `kelas-${generateId(10)}`

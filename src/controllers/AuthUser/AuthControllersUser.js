@@ -74,10 +74,18 @@ class AuthControllersUser extends AuthController {
     } catch (error) {
       await this.authService.deleteRefreshToken(refreshTokenUser)
 
-      return res.status(403).clearCookie('refreshTokenUser').clearCookie('role').json({
-        status: 'fail',
-        message: error.message
-      })
+      return res
+        .status(403)
+        .clearCookie('refreshTokenUser', {
+          domain: '.kalleriagroup.com'
+        })
+        .clearCookie('role', {
+          domain: '.kalleriagroup.com'
+        })
+        .json({
+          status: 'fail',
+          message: error.message
+        })
     }
   }
 
@@ -87,10 +95,18 @@ class AuthControllersUser extends AuthController {
       await this.authService.verifyRefreshToken(refreshTokenUser)
       await this.authService.deleteRefreshToken(refreshTokenUser)
 
-      return res.status(200).clearCookie('refreshTokenUser').clearCookie('role').json({
-        status: 'success',
-        message: 'Anda berhasil keluar'
-      })
+      return res
+        .status(200)
+        .clearCookie('refreshTokenUser', {
+          domain: '.kalleriagroup.com'
+        })
+        .clearCookie('role', {
+          domain: '.kalleriagroup.com'
+        })
+        .json({
+          status: 'success',
+          message: 'Anda berhasil keluar'
+        })
     } catch (error) {
       return res.status(400).json({
         status: 'fail',

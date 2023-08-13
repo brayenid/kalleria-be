@@ -46,7 +46,7 @@ class UserController {
   async patchUserDetailInfo(req, res) {
     const { id } = req.user
     try {
-      const getUrlPath = (fullPath) => fullPath.path.split('\\').splice(6, 9).join('/')
+      const getUrlPath = (fullPath) => fullPath.path.split('/').splice(6, 9).join('/')
 
       const { nama, alamat, email, noTelepon, asalSekolah, noIdentitas, jenisKelamin, tanggalLahir, tempatLahir } = req.body
       let urlFoto

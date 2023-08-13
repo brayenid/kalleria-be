@@ -51,7 +51,7 @@ class TransaksiBeliKelasController {
         message: 'Berkas bukti pembayaran harus diunggah.'
       })
     }
-    const getUrlPath = (fullPath) => fullPath.path.split('\\').splice(6, 9).join('/')
+    const getUrlPath = (fullPath) => fullPath.path.split('/').splice(6, 9).join('/')
     const urlBuktiBayar = getUrlPath(req.file)
 
     try {

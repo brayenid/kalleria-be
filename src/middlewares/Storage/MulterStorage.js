@@ -1,7 +1,6 @@
 const multer = require('multer')
 const fs = require('fs')
 const path = require('path')
-const logger = require('../../logs/winston')
 
 const storageProfilePhoto = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -24,7 +23,6 @@ const storageProfilePhoto = multer.diskStorage({
 const storageThumbnailKelas = multer.diskStorage({
   destination: (req, file, cb) => {
     const destinationPath = path.resolve(__dirname, '..', '..', 'public', 'uploads', 'kelas')
-    logger.info(destinationPath)
     if (!fs.existsSync(destinationPath)) {
       fs.mkdirSync(destinationPath, { recursive: true })
     }

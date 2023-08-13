@@ -2,6 +2,7 @@ const autoBind = require('auto-bind')
 const path = require('path')
 const { unamedThumbnailCleaner, deletePhotoByPath, oldPhotosCleaner } = require('../../utils/PhotosCleaner')
 const { generateId } = require('../../utils/IdGenerator')
+const logger = require('../../logs/winston')
 
 class KelasController {
   constructor(service) {
@@ -14,6 +15,7 @@ class KelasController {
     const { namaKelas, tipeKelas, hargaKelas, deskripsiKelas } = req.body
     const getUrlPath = (fullPath) => fullPath.path.split('\\').splice(6, 9).join('/')
     const thumbnailKelas = getUrlPath(req.file)
+    logger.info(thumbnailKelas)
 
     try {
       const id = `kelas-${generateId(10)}`

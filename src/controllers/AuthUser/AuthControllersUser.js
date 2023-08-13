@@ -29,10 +29,12 @@ class AuthControllersUser extends AuthController {
       res
         .status(200)
         .cookie('refreshTokenUser', refreshToken, {
-          domain: 'localhost',
+          domain: 'lpk.kalleriagroup.com',
           httpOnly: true,
           signed: true,
-          maxAge: config.cookies.age
+          maxAge: config.cookies.age,
+          secure: true,
+          sameSite: 'none'
         })
         .cookie('role', 'user', {
           domain: 'localhost',

@@ -9,7 +9,7 @@ const path = require('path')
 
 app.use(
   cors({
-    origin: ['http://localhost:5173'],
+    origin: ['https://lpk.kalleriagroup.com'],
     credentials: true
   })
 )

@@ -29,10 +29,12 @@ class AuthControllersAdmin extends AuthController {
       res
         .status(200)
         .cookie('refreshTokenAdmin', refreshToken, {
-          domain: 'localhost',
+          domain: 'lpk.kalleriagroup.com',
           httpOnly: true,
           signed: true,
-          maxAge: config.cookies.age
+          maxAge: config.cookies.age,
+          secure: true,
+          sameSite: 'none'
         })
         .cookie('role', 'admin', {
           domain: 'localhost',

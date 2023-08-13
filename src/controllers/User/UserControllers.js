@@ -3,7 +3,6 @@ const autoBind = require('auto-bind')
 const path = require('path')
 const { oldPhotosCleaner } = require('../../utils/PhotosCleaner')
 const { generateId } = require('../../utils/IdGenerator')
-const logger = require('../../logs/winston')
 
 class UserController {
   constructor(service) {
@@ -54,7 +53,6 @@ class UserController {
       if (req.file) {
         urlFoto = getUrlPath(req.file)
         const destinationPath = path.resolve(__dirname, '..', '..', 'public', 'uploads', 'foto')
-        logger.info(`User: ${urlFoto} and path ${req.file.path}`)
         // HANDLE DUPLICATE USER's PHOTO AFTER UPDATE //
         oldPhotosCleaner({ destinationPath, urlFoto, photoDir: 'foto' })
       } else {

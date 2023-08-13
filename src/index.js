@@ -6,7 +6,7 @@ const app = express()
 const config = require('./config')
 const router = require('./routes')
 const path = require('path')
-const origin = config.env === 'dev' ? 'http://localhost:5173' : 'https://lpk.kalleriagroup.com'
+const origin = config.env === 'dev' ? 'http://localhost:5173' : ['https://lpk.kalleriagroup.com']
 
 app.use(
   cors({

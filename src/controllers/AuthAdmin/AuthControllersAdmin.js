@@ -1,7 +1,7 @@
 const autoBind = require('auto-bind')
 const AuthController = require('../../interfaces/controllers/AuthControllers')
 const TokenManager = require('../../utils/TokenManager')
-const config = require('../../config')
+const { cookieOptRefresh, cookieOptRole, clearCookieOpt } = require('../../config/cookies')
 
 class AuthControllersAdmin extends AuthController {
   constructor(adminService, authService) {
@@ -26,29 +26,13 @@ class AuthControllersAdmin extends AuthController {
         accountId: id
       })
 
-      res
-        .status(200)
-        .cookie('refreshTokenAdmin', refreshToken, {
-          domain: '.kalleriagroup.com',
-          httpOnly: true,
-          signed: true,
-          maxAge: config.cookies.age,
-          secure: true,
-          sameSite: 'none'
-        })
-        .cookie('role', 'admin', {
-          domain: '.kalleriagroup.com',
-          maxAge: config.cookies.age,
-          secure: true,
-          sameSite: 'none'
-        })
-        .json({
-          status: 'success',
-          message: 'Anda berhasil masuk',
-          data: {
-            accessToken
-          }
-        })
+      res.status(200).cookie('refreshTokenAdmin', refreshToken, cookieOptRefresh()).cookie('role', 'admin', cookieOptRole()).json({
+        status: 'success',
+        message: 'Anda berhasil masuk',
+        data: {
+          accessToken
+        }
+      })
     } catch (error) {
       return res.status(404).json({
         status: 'fail',
@@ -74,18 +58,10 @@ class AuthControllersAdmin extends AuthController {
     } catch (error) {
       await this.authService.deleteRefreshToken(refreshTokenAdmin)
 
-      return res
-        .status(403)
-        .clearCookie('refreshTokenAdmin', {
-          domain: '.kalleriagroup.com'
-        })
-        .clearCookie('role', {
-          domain: '.kalleriagroup.com'
-        })
-        .json({
-          status: 'fail',
-          message: error.message
-        })
+      return res.status(403).clearCookie('refreshTokenAdmin', clearCookieOpt()).clearCookie('role', clearCookieOpt()).json({
+        status: 'fail',
+        message: error.message
+      })
     }
   }
 
@@ -95,18 +71,10 @@ class AuthControllersAdmin extends AuthController {
       await this.authService.verifyRefreshToken(refreshTokenAdmin)
       await this.authService.deleteRefreshToken(refreshTokenAdmin)
 
-      return res
-        .status(200)
-        .clearCookie('refreshTokenAdmin', {
-          domain: '.kalleriagroup.com'
-        })
-        .clearCookie('role', {
-          domain: '.kalleriagroup.com'
-        })
-        .json({
-          status: 'success',
-          message: 'Anda berhasil keluar'
-        })
+      return res.status(200).clearCookie('refreshTokenAdmin', clearCookieOpt()).clearCookie('role', clearCookieOpt()).json({
+        status: 'success',
+        message: 'Anda berhasil keluar'
+      })
     } catch (error) {
       return res.status(400).json({
         status: 'fail',

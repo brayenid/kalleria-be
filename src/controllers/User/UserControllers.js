@@ -3,6 +3,7 @@ const autoBind = require('auto-bind')
 const path = require('path')
 const { oldPhotosCleaner } = require('../../utils/PhotosCleaner')
 const { generateId } = require('../../utils/IdGenerator')
+const { getUrlPath } = require('../../utils/ImgHelper')
 
 class UserController {
   constructor(service) {
@@ -46,12 +47,12 @@ class UserController {
   async patchUserDetailInfo(req, res) {
     const { id } = req.user
     try {
-      const getUrlPath = (fullPath) => fullPath.path.split('/').splice(6, 9).join('/')
+      // const getUrlPath = (fullPath) => fullPath.path.split('/').splice(6, 9).join('/')
 
       const { nama, alamat, email, noTelepon, asalSekolah, noIdentitas, jenisKelamin, tanggalLahir, tempatLahir } = req.body
       let urlFoto
       if (req.file) {
-        urlFoto = getUrlPath(req.file)
+        urlFoto = getUrlPath(req.file, 6, 9)
         const destinationPath = path.resolve(__dirname, '..', '..', 'public', 'uploads', 'foto')
         // HANDLE DUPLICATE USER's PHOTO AFTER UPDATE //
         oldPhotosCleaner({ destinationPath, urlFoto, photoDir: 'foto' })

@@ -2,6 +2,7 @@ const autoBind = require('auto-bind')
 const path = require('path')
 const { unamedThumbnailCleaner, deletePhotoByPath, oldPhotosCleaner } = require('../../utils/PhotosCleaner')
 const { generateId } = require('../../utils/IdGenerator')
+const { getUrlPath } = require('../../utils/ImgHelper')
 
 class KelasController {
   constructor(service) {
@@ -12,8 +13,8 @@ class KelasController {
 
   async addKelas(req, res) {
     const { namaKelas, tipeKelas, hargaKelas, deskripsiKelas } = req.body
-    const getUrlPath = (fullPath) => fullPath.path.split('/').splice(6, 9).join('/')
-    const thumbnailKelas = getUrlPath(req.file)
+    // const getUrlPath = (fullPath) => fullPath.path.split('/').splice(6, 9).join('/')
+    const thumbnailKelas = getUrlPath(req.file, 6, 9)
 
     try {
       const id = `kelas-${generateId(10)}`
@@ -58,11 +59,11 @@ class KelasController {
       if (!thumbnailKelas) {
         throw new Error('Kelas tidak ditemukan')
       }
-      const getUrlPath = (fullPath) => fullPath.path.split('\\').splice(6, 9).join('/')
+      // const getUrlPath = (fullPath) => fullPath.path.split('\\').splice(6, 9).join('/')
 
       let urlThumbnail
       if (req.file) {
-        urlThumbnail = getUrlPath(req.file)
+        urlThumbnail = getUrlPath(req.file, 6, 9)
         const destinationPath = path.resolve(__dirname, '..', '..', 'public', 'uploads', 'kelas')
 
         // HANDLE DUPLICATE PHOTO AFTER UPDATE //

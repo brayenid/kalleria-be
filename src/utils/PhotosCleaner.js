@@ -40,7 +40,6 @@ exports.oldTransaksiCleaner = ({ destinationPath, urlFoto }) => {
 
     // GET PHOTOS PATH WITHOUT EXTENSION
     const getPhotoPathWannaDeleteNoExt = urlFoto.split('/')[2].split('.')[0].split('_').slice(0, 3).join('_')
-    console.log(getPhotoPathWannaDeleteNoExt)
 
     // GET ALL PHOTOS THAT BELONG TO THE USER, AND EXCLUDE THE NEW ONE
     const photosExceptTheNewOne = files.filter((file) => file.includes(getPhotoPathWannaDeleteNoExt))

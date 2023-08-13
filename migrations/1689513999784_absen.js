@@ -22,7 +22,6 @@ exports.up = (pgm) => {
     },
     admin: {
       type: 'VARCHAR(30)',
-      references: '"admins"',
       notNull: true
     },
     created_at: {

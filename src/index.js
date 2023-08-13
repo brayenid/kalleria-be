@@ -6,13 +6,17 @@ const app = express()
 const config = require('./config')
 const router = require('./routes')
 const path = require('path')
+const origin = config.env === 'dev' ? 'http://localhost:5173' : 'https://lpk.kalleriagroup.com'
 
 app.use(
   cors({
-    origin: ['https://lpk.kalleriagroup.com'],
+    origin,
     credentials: true
   })
 )
+
+console.log(origin)
+
 app.use(cookieParser(config.cookies.secret))
 app.use(express.json())
 app.use(

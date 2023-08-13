@@ -15,7 +15,8 @@ const config = {
   sudo: {
     username: process.env.SUDO_USERNAME,
     password: process.env.SUDO_PASSWORD
-  }
+  },
+  env: process.env.NODE_ENV?.trimEnd()
 }
 
 module.exports = config

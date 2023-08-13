@@ -2,6 +2,7 @@ const autoBind = require('auto-bind')
 const { deletePhotoByPath, oldTransaksiCleaner } = require('../../utils/PhotosCleaner')
 const path = require('path')
 const { generateId } = require('../../utils/IdGenerator')
+const { getUrlPath } = require('../../utils/ImgHelper')
 
 class TransaksiBeliKelasController {
   constructor(service, kelasService, kelasUsersService) {
@@ -51,8 +52,8 @@ class TransaksiBeliKelasController {
         message: 'Berkas bukti pembayaran harus diunggah.'
       })
     }
-    const getUrlPath = (fullPath) => fullPath.path.split('/').splice(6, 9).join('/')
-    const urlBuktiBayar = getUrlPath(req.file)
+    // const getUrlPath = (fullPath) => fullPath.path.split('/').splice(6, 9).join('/')
+    const urlBuktiBayar = getUrlPath(req.file, 6, 9)
 
     try {
       const isTransaksiBeliKelasAvailable = await this.service.getTransaksiById(idTransaksi)

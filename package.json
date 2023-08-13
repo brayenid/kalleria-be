@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon src/index.js",
+    "dev": "set NODE_ENV=dev&& nodemon src/index.js",
     "migrate": "node-pg-migrate"
   },
   "keywords": [],

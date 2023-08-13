@@ -1,8 +1,8 @@
 const bcrypt = require('bcrypt')
-const { nanoid } = require('nanoid')
 const autoBind = require('auto-bind')
 const path = require('path')
 const { oldPhotosCleaner } = require('../../utils/PhotosCleaner')
+const { generateId } = require('../../utils/IdGenerator')
 
 class UserController {
   constructor(service) {
@@ -15,7 +15,7 @@ class UserController {
     const { username, nama, noIdentitas, jenisKelamin, tempatLahir, tanggalLahir, alamat, email, noTelepon, password, asalSekolah } = req.body
     const usernameReplace = username.trim().replace(/\s/g, '')
     const payload = {
-      id: `user-${nanoid(12)}`,
+      id: `user-${generateId(12)}`,
       username: usernameReplace,
       nama,
       noIdentitas,
@@ -48,7 +48,7 @@ class UserController {
     try {
       const getUrlPath = (fullPath) => fullPath.path.split('\\').splice(6, 9).join('/')
 
-      const { nama, alamat, email, noTelepon, asalSekolah, noIdentitas } = req.body
+      const { nama, alamat, email, noTelepon, asalSekolah, noIdentitas, jenisKelamin, tanggalLahir, tempatLahir } = req.body
       let urlFoto
       if (req.file) {
         urlFoto = getUrlPath(req.file)
@@ -57,8 +57,8 @@ class UserController {
         // HANDLE DUPLICATE USER's PHOTO AFTER UPDATE //
         oldPhotosCleaner({ destinationPath, urlFoto, photoDir: 'foto' })
       } else {
-        const { url_foto } = await this.service.getAccountById(id)
-        urlFoto = url_foto
+        const { urlFoto: url } = await this.service.getAccountById(id)
+        urlFoto = url
       }
 
       const payload = {
@@ -68,7 +68,10 @@ class UserController {
         noTelepon,
         asalSekolah,
         noIdentitas,
-        urlFoto
+        urlFoto,
+        jenisKelamin,
+        tanggalLahir,
+        tempatLahir
       }
 
       await this.service.patchAccountDetail(id, payload)

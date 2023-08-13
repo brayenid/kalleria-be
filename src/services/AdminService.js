@@ -65,12 +65,58 @@ class AdminService extends AccountService {
     }
   }
 
-  async getAccounts() {
+  async getAccounts(pageNumber = 1, pageSize = 20, search = '') {
+    const offset = (pageNumber - 1) * pageSize
+
     try {
-      const { rows } = await this._pool.query('SELECT id, username, nama FROM admins')
-      return rows
+      const query = {
+        text: `
+        SELECT
+        id,
+        username,
+        nama,
+        created_at AS "createdAt",
+        updated_at AS "updatedAt"
+        FROM
+        admins
+        WHERE 
+        id ILIKE $3 OR nama ILIKE $3 OR username ILIKE $3
+        ORDER BY
+        created_at
+        LIMIT $1 OFFSET $2
+        `,
+        values: [pageSize, offset, `%${search}%`]
+      }
+      const { rows } = await this._pool.query(query)
+      const total = await this._getAccountsTotal(search)
+
+      return {
+        total,
+        rows
+      }
     } catch (error) {
       throw new Error(`Gagal mendapatkan semua akun: ${error.message}`)
+    }
+  }
+
+  async _getAccountsTotal(search = '') {
+    try {
+      const query = {
+        text: `
+        SELECT
+        COUNT(*) AS "totalAdmins"
+        FROM 
+        admins
+        WHERE 
+        id ILIKE $1 OR nama ILIKE $1 OR username ILIKE $1
+        `,
+        values: [`%${search}%`]
+      }
+      const { rows } = await this._pool.query(query)
+
+      return Number(rows[0].totalAdmins)
+    } catch (error) {
+      throw new Error(`Gagal mendapatkan total admin: ${error.message}`)
     }
   }
 

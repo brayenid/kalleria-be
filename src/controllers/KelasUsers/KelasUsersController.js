@@ -52,10 +52,10 @@ class KelasUsersController {
   }
 
   async getAllKelasUsers(req, res) {
-    const { pageSize, pageNumber, username } = req.query
+    const { pageSize, pageNumber, search } = req.query
 
     try {
-      const response = await this.service.getKelasUsers(pageNumber, pageSize, username)
+      const response = await this.service.getKelasUsers(pageNumber, pageSize, search)
 
       return res.status(200).json({
         status: 'success',
@@ -71,9 +71,10 @@ class KelasUsersController {
 
   async getKelasUsersByUserId(req, res) {
     const { id: userId } = req.user
+    const { pageSize, pageNumber } = req.query
 
     try {
-      const response = await this.service.getKelasUsersByUserId(userId)
+      const response = await this.service.getKelasUsersByUserId(pageNumber, pageSize, userId)
 
       return res.status(200).json({
         status: 'success',

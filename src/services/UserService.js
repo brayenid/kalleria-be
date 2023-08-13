@@ -24,13 +24,28 @@ class UserService extends AccountService {
   }
 
   async patchAccountDetail(id, payload) {
-    const { nama, alamat, email, noTelepon, asalSekolah, noIdentitas, urlFoto } = payload
+    const { nama, alamat, email, noTelepon, asalSekolah, noIdentitas, urlFoto, jenisKelamin, tanggalLahir, tempatLahir } = payload
     const currentTime = new Date()
 
     try {
       const query = {
-        text: 'UPDATE users SET nama = $1, alamat = $2, email = $3, no_telepon = $4, asal_sekolah = $5, no_identitas = $6, url_foto = $7, updated_at = $8 WHERE id = $9',
-        values: [nama, alamat, email, noTelepon, asalSekolah, noIdentitas, urlFoto, currentTime, id]
+        text: `
+        UPDATE 
+        users 
+        SET 
+        nama = $1, 
+        alamat = $2, 
+        email = $3, 
+        no_telepon = $4, 
+        asal_sekolah = $5, 
+        no_identitas = $6, 
+        url_foto = $7,
+        jenis_kelamin = $8,
+        tanggal_lahir = $9,
+        tempat_lahir = $10,
+        updated_at = $11 
+        WHERE id = $12`,
+        values: [nama, alamat, email, noTelepon, asalSekolah, noIdentitas, urlFoto, jenisKelamin, tanggalLahir, tempatLahir, currentTime, id]
       }
       await this._pool.query(query)
     } catch (error) {
@@ -111,7 +126,23 @@ class UserService extends AccountService {
 
   async getAccountById(id) {
     const query = {
-      text: 'SELECT id, username, nama, alamat, jenis_kelamin AS "jenisKelamin", tempat_lahir AS "tempatLahir", tanggal_lahir AS "tanggalLahir", email, no_telepon AS "nomorTelepon", asal_sekolah AS "asalSekolah", no_identitas AS "noIdentitas", url_foto AS "urlFoto", created_at AS "createdAt", updated_at AS "updatedAt" FROM users WHERE id = $1',
+      text: `
+      SELECT 
+      id, 
+      username, 
+      nama, 
+      alamat, 
+      jenis_kelamin AS "jenisKelamin", 
+      tempat_lahir AS "tempatLahir", 
+      tanggal_lahir AS "tanggalLahir", 
+      email, 
+      no_telepon AS "noTelepon", 
+      asal_sekolah AS "asalSekolah", 
+      no_identitas AS "noIdentitas", 
+      url_foto AS "urlFoto", 
+      created_at AS "createdAt", 
+      updated_at AS "updatedAt" 
+      FROM users WHERE id = $1`,
       values: [id]
     }
     const { rowCount, rows } = await this._pool.query(query)

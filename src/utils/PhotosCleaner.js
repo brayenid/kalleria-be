@@ -31,7 +31,7 @@ exports.oldPhotosCleaner = ({ destinationPath, urlFoto, photoDir }) => {
   })
 }
 
-exports.oldTransaksiCleaner = ({ destinationPath, urlFoto, photoDir }) => {
+exports.oldTransaksiCleaner = ({ destinationPath, urlFoto }) => {
   fs.readdir(destinationPath, (err, files) => {
     if (err) {
       console.log(err)
@@ -40,6 +40,7 @@ exports.oldTransaksiCleaner = ({ destinationPath, urlFoto, photoDir }) => {
 
     // GET PHOTOS PATH WITHOUT EXTENSION
     const getPhotoPathWannaDeleteNoExt = urlFoto.split('/')[2].split('.')[0].split('_').slice(0, 3).join('_')
+    console.log(getPhotoPathWannaDeleteNoExt)
 
     // GET ALL PHOTOS THAT BELONG TO THE USER, AND EXCLUDE THE NEW ONE
     const photosExceptTheNewOne = files.filter((file) => file.includes(getPhotoPathWannaDeleteNoExt))
@@ -52,7 +53,7 @@ exports.oldTransaksiCleaner = ({ destinationPath, urlFoto, photoDir }) => {
 
     // UNLINK OLD PHOTOS
     photosExceptTheNewOne.forEach((file) => {
-      const pathToDelete = `src/public/uploads/${photoDir}`
+      const pathToDelete = 'src/public/uploads/transaksi'
       fs.unlink(`${pathToDelete}/${file}`, (err) => {
         if (err) {
           console.error(`Gagal menghapus file ${file}:`, err)

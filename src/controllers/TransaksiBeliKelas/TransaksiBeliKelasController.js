@@ -1,6 +1,7 @@
 const autoBind = require('auto-bind')
-const { nanoid } = require('nanoid')
-const { deletePhotoByPath } = require('../../utils/PhotosCleaner')
+const { deletePhotoByPath, oldTransaksiCleaner } = require('../../utils/PhotosCleaner')
+const path = require('path')
+const { generateId } = require('../../utils/IdGenerator')
 
 class TransaksiBeliKelasController {
   constructor(service, kelasService, kelasUsersService) {
@@ -14,8 +15,7 @@ class TransaksiBeliKelasController {
   async addTransaksiBeliKelas(req, res) {
     const { kelasId } = req.params
     const { id: userId } = req.user
-    const id = `transaksi-${nanoid(24)}`
-
+    const id = `transaksi-${generateId(24)}`
     try {
       const isKelasAvailable = await this.kelasService.getKelasById(kelasId)
       if (!isKelasAvailable) {
@@ -66,7 +66,10 @@ class TransaksiBeliKelasController {
         throw new Error('Gagal menambahkan bukti transaksi: Anda telah mengirimkan bukti dan diterima')
       }
 
+      const destinationPath = path.resolve(__dirname, '..', '..', 'public', 'uploads', 'transaksi')
+
       await this.service.patchBuktiTransaksi(idTransaksi, urlBuktiBayar)
+      oldTransaksiCleaner({ destinationPath, urlFoto: urlBuktiBayar })
 
       return res.status(200).json({
         status: 'success',
@@ -104,7 +107,7 @@ class TransaksiBeliKelasController {
       let responseMessage = 'Status transaksi beli kelas berhasil diubah'
 
       if (status === 'diterima' && isKelasUsersAvailable) {
-        const kelasUsersId = `kelasuser-${nanoid(20)}`
+        const kelasUsersId = `kelasuser-${generateId(20)}`
         const kelasUsersPayload = {
           id: kelasUsersId,
           userId,
@@ -131,6 +134,32 @@ class TransaksiBeliKelasController {
     const { pageNumber, pageSize, status, search } = req.query
     try {
       const response = await this.service.getAllTransaksi(pageNumber, pageSize, status, search)
+
+      return res.status(200).json({
+        status: 'success',
+        data: response
+      })
+    } catch (error) {
+      return res.status(400).json({
+        status: 'fail',
+        message: error.message
+      })
+    }
+  }
+
+  async getAllTransaksiByDate(req, res) {
+    const { pageSize, status, from, to } = req.query
+
+    try {
+      const datePattern = /^\d{4}-\d{2}-\d{2}$/
+      if (!from || !to) {
+        throw new Error('Gagal mendapatkan data transaksi: Harus memiliki query rentang tanggal (Mis. example.com/date?from=2023-08-01&to=2023-08-31)')
+      }
+      if (!datePattern.test(from) || !datePattern.test(to)) {
+        throw new Error('Gagal mendapatkan data transaksi: Pola tanggal yang benar TTTT/BB/HH')
+      }
+
+      const response = await this.service.getAllTransaksiByDate(pageSize, status, from, to)
 
       return res.status(200).json({
         status: 'success',

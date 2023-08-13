@@ -70,7 +70,7 @@ class AuthControllersAdmin extends AuthController {
     } catch (error) {
       await this.authService.deleteRefreshToken(refreshTokenSudo)
 
-      return res.status(403).clearCookie('refreshTokenSudo').json({
+      return res.status(403).clearCookie('refreshTokenSudo').clearCookie('role').json({
         status: 'fail',
         message: error.message
       })

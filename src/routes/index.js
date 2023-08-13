@@ -91,6 +91,7 @@ router.post('/transaksi/:kelasId', validateAuthUser.validateStrict, transaksiBel
 router.patch('/transaksi/:idTransaksi', validateAuthUser.validateStrict, buktiBayarUpload, transaksiBeliKelasController.patchBuktiBayarTransaksi)
 router.put('/transaksi/:idTransaksi', validateAuthAdmin.validate, putBuktiBayarValidator, transaksiBeliKelasController.putStatusTransakasiBeliKelas)
 router.get('/transaksi', validateAuthAdmin.validate, transaksiBeliKelasController.getAllTransaksi)
+router.get('/transaksi/date', validateAuthAdmin.validate, transaksiBeliKelasController.getAllTransaksiByDate)
 router.get('/transaksi/detail/:transaksiId', validateAuthUser.validateLoose, transaksiBeliKelasController.getTransaksiById)
 router.get('/transaksi/user', validateAuthUser.validateStrict, transaksiBeliKelasController.getTransaksiByUserIdUser)
 router.get('/transaksi/user/:id', validateAuthAdmin.validate, transaksiBeliKelasController.getTransaksiByUserIdAdminSudo)
@@ -105,6 +106,7 @@ router.get('/kelasuser/user', validateAuthUser.validateStrict, kelasUsersControl
 
 // ABSEN ROUTES
 router.post('/absen', validateAuthAdmin.validate, absenValidator, absenController.addAbsen)
+router.get('/absen', validateAuthAdmin.validate, absenController.getAbsen)
 router.get('/absen/:kelasId', validateAuthAdmin.validate, absenController.getAbsenByKelasId)
 
 module.exports = router

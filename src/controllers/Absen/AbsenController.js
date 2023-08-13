@@ -69,6 +69,24 @@ class AbsenController {
       })
     }
   }
+
+  async getAbsen(req, res) {
+    const { pageSize, pageNumber, search } = req.query
+
+    try {
+      const response = await this.service.getAllAbsen(search, pageSize, pageNumber)
+
+      return res.status(200).json({
+        status: 'success',
+        data: response
+      })
+    } catch (error) {
+      return res.status(400).json({
+        status: 'fail',
+        message: error.message
+      })
+    }
+  }
 }
 
 module.exports = AbsenController

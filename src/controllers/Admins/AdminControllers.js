@@ -1,6 +1,6 @@
 const bcrypt = require('bcrypt')
-const { nanoid } = require('nanoid')
 const autoBind = require('auto-bind')
+const { generateId } = require('../../utils/IdGenerator')
 
 class AdminControllers {
   constructor(service) {
@@ -13,7 +13,7 @@ class AdminControllers {
     const { username, nama, password } = req.body
     const usernameReplace = username.trim().replace(/\s/g, '')
     const payload = {
-      id: `admin-${nanoid(12)}`,
+      id: `admin-${generateId(12)}`,
       username: usernameReplace,
       nama,
       password: await bcrypt.hash(password, 10)
@@ -88,16 +88,17 @@ class AdminControllers {
   }
 
   async getAdmins(req, res) {
+    const { pageSize, pageNumber, search } = req.query
     try {
-      const response = await this.service.getAccounts()
+      const response = await this.service.getAccounts(pageNumber, pageSize, search)
       return res.status(200).json({
         status: 'success',
-        data: [...response]
+        data: response
       })
     } catch (error) {
-      return res.status(500).json({
+      return res.status(400).json({
         status: 'fail',
-        message: 'server error'
+        message: error.message
       })
     }
   }

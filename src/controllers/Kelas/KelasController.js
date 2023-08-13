@@ -1,7 +1,7 @@
 const autoBind = require('auto-bind')
-const { nanoid } = require('nanoid')
 const path = require('path')
-const { unamedThumbnailCleaner, deletePhotoByPath } = require('../../utils/PhotosCleaner')
+const { unamedThumbnailCleaner, deletePhotoByPath, oldPhotosCleaner } = require('../../utils/PhotosCleaner')
+const { generateId } = require('../../utils/IdGenerator')
 
 class KelasController {
   constructor(service) {
@@ -16,7 +16,7 @@ class KelasController {
     const thumbnailKelas = getUrlPath(req.file)
 
     try {
-      const id = `kelas-${nanoid(10)}`
+      const id = `kelas-${generateId(10)}`
 
       const destinationPath = path.resolve(__dirname, '..', '..', 'public', 'uploads', 'kelas')
 
@@ -65,8 +65,8 @@ class KelasController {
         urlThumbnail = getUrlPath(req.file)
         const destinationPath = path.resolve(__dirname, '..', '..', 'public', 'uploads', 'kelas')
 
-        // HANDLE DUPLICATE USER's PHOTO AFTER UPDATE //
-        // oldPhotosCleaner({ destinationPath, urlFoto: urlThumbnail, photoDir: 'kelas' })
+        // HANDLE DUPLICATE PHOTO AFTER UPDATE //
+        oldPhotosCleaner({ destinationPath, urlFoto: urlThumbnail, photoDir: 'kelas' })
         unamedThumbnailCleaner(destinationPath, 'kelas')
       } else {
         urlThumbnail = thumbnailKelas

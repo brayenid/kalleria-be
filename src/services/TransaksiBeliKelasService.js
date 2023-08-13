@@ -21,10 +21,11 @@ class TransaksiBeliKelasService {
   }
 
   async patchBuktiTransaksi(id, urlBuktiBayar) {
+    const currentTime = new Date()
     try {
       const query = {
-        text: "UPDATE transaksi_beli_kelas SET url_bukti_bayar = $1, status = 'dibayar' WHERE id = $2",
-        values: [urlBuktiBayar, id]
+        text: "UPDATE transaksi_beli_kelas SET url_bukti_bayar = $1, status = 'dibayar', updated_at = $2 WHERE id = $3",
+        values: [urlBuktiBayar, currentTime, id]
       }
 
       await this._pool.query(query)
@@ -56,10 +57,12 @@ class TransaksiBeliKelasService {
         text: `
         SELECT 
         transaksi_beli_kelas.id, 
-        'Pembelian: ' || kelas.nama_kelas AS "namaTransaksi",
+        'Pembelian ' || kelas.nama_kelas AS "namaTransaksi",
         transaksi_beli_kelas.user_id AS "userId", 
+        users.nama,
         transaksi_beli_kelas.kelas_id AS "kelasId", 
-        transaksi_beli_kelas.status, 
+        transaksi_beli_kelas.status,
+        kelas.harga_kelas AS "hargaKelas",
         transaksi_beli_kelas.url_bukti_bayar AS "urlBuktiBayar", 
         transaksi_beli_kelas.message, 
         transaksi_beli_kelas.accepted_by AS "acceptedBy",
@@ -69,10 +72,15 @@ class TransaksiBeliKelasService {
         transaksi_beli_kelas
         JOIN kelas 
         ON transaksi_beli_kelas.kelas_id = kelas.id
+        JOIN users
+        ON transaksi_beli_kelas.user_id = users.id
         WHERE transaksi_beli_kelas.id = $1`,
         values: [id]
       }
-      const { rows } = await this._pool.query(query)
+      const { rows, rowCount } = await this._pool.query(query)
+      if (!rowCount) {
+        throw new Error('Transaksi tidak ada')
+      }
 
       return rows[0]
     } catch (error) {
@@ -235,17 +243,15 @@ class TransaksiBeliKelasService {
         ON transaksi_beli_kelas.kelas_id = kelas.id
         JOIN users
         ON transaksi_beli_kelas.user_id = users.id
-        WHERE users.nama ILIKE $3 OR users.username ILIKE $3 OR kelas.nama_kelas ILIKE $3`,
+        WHERE (users.nama ILIKE $3 OR users.username ILIKE $3 OR kelas.nama_kelas ILIKE $3 OR transaksi_beli_kelas.id ILIKE $3)`,
         values: [pageSize, offset, `%${search}%`]
       }
       if (status) {
-        query.text += ' WHERE transaksi_beli_kelas.status = $4'
+        query.text += ' AND transaksi_beli_kelas.status = $4'
         query.values.push(status)
       }
       query.text += ' ORDER BY transaksi_beli_kelas.updated_at DESC LIMIT $1 OFFSET $2'
-
       const { rows } = await this._pool.query(query)
-
       const total = await this._getAllTransaksiTotal(status, search)
 
       return { total, page: Number(pageNumber), rows }
@@ -254,29 +260,65 @@ class TransaksiBeliKelasService {
     }
   }
 
-  async _getAllTransaksiTotal(status, nama) {
+  async _getAllTransaksiTotal(status, search) {
     try {
       const query = {
         text: `
         SELECT 
-        COUNT(transaksi_beli_kelas.*) AS "totalTransaksi"
+        COUNT(*) AS "totalTransaksi"
         FROM 
-        transaksi_beli_kelas
-        JOIN
-        users
-        ON
-        transaksi_beli_kelas.user_id = users.id
-        WHERE users.nama ILIKE $1`,
-        values: [`%${nama}%`]
+        transaksi_beli_kelas 
+        JOIN kelas 
+        ON transaksi_beli_kelas.kelas_id = kelas.id
+        JOIN users
+        ON transaksi_beli_kelas.user_id = users.id
+        WHERE (users.nama ILIKE $1 OR users.username ILIKE $1 OR kelas.nama_kelas ILIKE $1 OR transaksi_beli_kelas.id ILIKE $1)`,
+        values: [`%${search}%`]
       }
       if (status) {
-        query.text += ' WHERE status = $2'
+        query.text += ' AND transaksi_beli_kelas.status = $2'
         query.values.push(status)
       }
       const { rows } = await this._pool.query(query)
       return Number(rows[0].totalTransaksi)
     } catch (error) {
       throw new Error(`Gagal mendapatkan total semua transaksi: ${error.message}`)
+    }
+  }
+
+  async getAllTransaksiByDate(pageSize = 31, status = 'diterima', from, to) {
+    try {
+      const query = {
+        text: `
+        SELECT 
+        transaksi_beli_kelas.id, 
+        'Pembelian: ' || kelas.nama_kelas AS "namaTransaksi",
+        transaksi_beli_kelas.user_id AS "userId", 
+        users.nama,
+        transaksi_beli_kelas.kelas_id AS "kelasId",
+        kelas.harga_kelas AS "hargaKelas", 
+        transaksi_beli_kelas.status, 
+        transaksi_beli_kelas.created_at AS "createdAt", 
+        transaksi_beli_kelas.updated_at AS "updatedAt"
+        FROM 
+        transaksi_beli_kelas 
+        JOIN kelas 
+        ON transaksi_beli_kelas.kelas_id = kelas.id
+        JOIN users
+        ON transaksi_beli_kelas.user_id = users.id
+        WHERE 
+        (transaksi_beli_kelas.updated_at >= $3 AND transaksi_beli_kelas.updated_at <= $4) 
+        AND transaksi_beli_kelas.status = $2
+        ORDER BY 
+        transaksi_beli_kelas.updated_at ASC 
+        LIMIT $1`,
+        values: [pageSize, status, from, to]
+      }
+
+      const { rows } = await this._pool.query(query)
+      return rows
+    } catch (error) {
+      throw new Error(`Gagal mendapatkan semua transaksi: ${error.message}`)
     }
   }
 }

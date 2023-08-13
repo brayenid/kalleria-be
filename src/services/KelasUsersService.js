@@ -63,29 +63,75 @@ class KelasUsersService {
     }
   }
 
-  async getKelasUsersByUserId(userId) {
+  async getKelasUsersByUserId(pageNumber = 1, pageSize = 20, userId) {
+    const offset = (pageNumber - 1) * pageSize
     try {
       const query = {
         text: `
         SELECT 
-        id, 
-        user_id AS "userId", 
-        kelas_id AS "kelasId", 
-        maksimal_pertemuan AS "maksimalPertemuan", 
-        presensi, 
-        created_at AS "createdAt", 
-        updated_at AS "updatedAt" 
+        kelas_users.id,
+        users.nama,
+        kelas.id AS "kelasId",
+        kelas.nama_kelas AS "namaKelas",
+        kelas.tipe_kelas AS "tipeKelas",
+        kelas.thumbnail_kelas AS "thumbnailKelas",
+        kelas_users.maksimal_pertemuan AS "maksimalPertemuan", 
+        kelas_users.presensi, 
+        kelas_users.created_at AS "createdAt", 
+        kelas_users.updated_at AS "updatedAt" 
         FROM 
-        kelas_users 
-        WHERE user_id = $1`,
+        kelas_users
+        JOIN
+        users
+        ON
+        kelas_users.user_id = users.id
+        JOIN
+        kelas
+        ON
+        kelas_users.kelas_id = kelas.id
+        WHERE kelas_users.user_id = $3
+        ORDER BY
+        kelas_users.updated_at DESC
+        LIMIT $1 OFFSET $2`,
+        values: [pageSize, offset, userId]
+      }
+
+      const { rows } = await this._pool.query(query)
+      const total = await this._getKelasUsersByUserIdTotal(userId)
+      return {
+        total,
+        rows
+      }
+    } catch (error) {
+      throw new Error(`Gagal mendapatkan kelas user: ${error.message}`)
+    }
+  }
+
+  async _getKelasUsersByUserIdTotal(userId) {
+    try {
+      const query = {
+        text: `
+        SELECT 
+        COUNT (kelas_users.*) AS "totalKelasUsers"
+        FROM 
+        kelas_users
+        JOIN
+        users
+        ON
+        kelas_users.user_id = users.id
+        JOIN
+        kelas
+        ON
+        kelas_users.kelas_id = kelas.id
+        WHERE kelas_users.user_id = $1`,
         values: [userId]
       }
 
       const { rows } = await this._pool.query(query)
 
-      return rows
+      return Number(rows[0].totalKelasUsers)
     } catch (error) {
-      throw new Error(`Gagal mendapatkan kelas user: ${error.message}`)
+      throw new Error(`Gagal mendapatkan total kelas user: ${error.message}`)
     }
   }
 
@@ -140,7 +186,7 @@ class KelasUsersService {
       }
 
       const { rows } = await this._pool.query(query)
-      if (pertemuan + rows[0].presensi > rows[0].maksimalPertemuan) {
+      if (Number(pertemuan) + rows[0].presensi > rows[0].maksimalPertemuan) {
         throw new Error('Pertemuan melebihi maksimal pertemuan')
       }
     } catch (error) {
@@ -148,14 +194,14 @@ class KelasUsersService {
     }
   }
 
-  async getKelasUsers(pageNumber = 1, pageSize = 20, username) {
+  async getKelasUsers(pageNumber = 1, pageSize = 20, search = '') {
     const offset = (pageNumber - 1) * pageSize
     try {
       const query = {
         text: `
         SELECT 
         kelas_users.id,
-        users.username,
+        users.nama,
         kelas.nama_kelas AS "namaKelas",
         kelas_users.maksimal_pertemuan AS "maksimalPertemuan", 
         kelas_users.presensi, 
@@ -171,22 +217,47 @@ class KelasUsersService {
         kelas
         ON
         kelas_users.kelas_id = kelas.id
+        WHERE users.username ILIKE $3 OR users.nama ILIKE $3 OR kelas.nama_kelas ILIKE $3
+        LIMIT $1 OFFSET $2
         `,
-        values: [pageSize, offset]
+        values: [pageSize, offset, `%${search}%`]
       }
-
-      if (username) {
-        query.text += ' WHERE users.username ILIKE $3'
-        query.values.push(`%${username}%`)
-      }
-
-      query.text += ' LIMIT $1 OFFSET $2'
 
       const { rows } = await this._pool.query(query)
+      const total = await this._getKelasUsersTotal(search)
 
-      return rows
+      return {
+        total,
+        rows
+      }
     } catch (error) {
       throw new Error(`Gagal mendapatkan semua kelas user: ${error.message}`)
+    }
+  }
+
+  async _getKelasUsersTotal(search) {
+    try {
+      const query = {
+        text: `
+        SELECT 
+        COUNT(kelas_users.*) AS "totalKelasUsers"
+        FROM 
+        kelas_users
+        JOIN
+        users
+        ON
+        kelas_users.user_id = users.id
+        JOIN
+        kelas
+        ON
+        kelas_users.kelas_id = kelas.id
+        WHERE users.username ILIKE $1 OR users.nama ILIKE $1 OR kelas.nama_kelas ILIKE $1`,
+        values: [`%${search}%`]
+      }
+      const { rows } = await this._pool.query(query)
+      return Number(rows[0].totalKelasUsers)
+    } catch (error) {
+      throw new Error(`Gagal mendapatkan total kelas user: ${error.message}`)
     }
   }
 

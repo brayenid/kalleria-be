@@ -37,8 +37,10 @@ class AuthControllersAdmin extends AuthController {
           sameSite: 'none'
         })
         .cookie('role', 'sudo', {
-          domain: 'localhost',
-          maxAge: config.cookies.age
+          domain: '.kalleriagroup.com',
+          maxAge: config.cookies.age,
+          secure: true,
+          sameSite: 'none'
         })
         .json({
           status: 'success',

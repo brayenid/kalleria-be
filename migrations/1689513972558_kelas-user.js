@@ -3,7 +3,7 @@
 exports.up = (pgm) => {
   pgm.createTable('kelas_users', {
     id: {
-      type: 'VARCHAR(30)',
+      type: 'VARCHAR(40)',
       primaryKey: true
     },
     user_id: {

@@ -16,7 +16,7 @@ class UserController {
     const { username, nama, noIdentitas, jenisKelamin, tempatLahir, tanggalLahir, alamat, email, noTelepon, password, asalSekolah } = req.body
     const usernameReplace = username.trim().replace(/\s/g, '')
     const payload = {
-      id: `user-${generateId(12)}`,
+      id: `user-${generateId(24)}`,
       username: usernameReplace,
       nama,
       noIdentitas,

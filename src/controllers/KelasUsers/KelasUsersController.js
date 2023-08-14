@@ -87,6 +87,25 @@ class KelasUsersController {
       })
     }
   }
+
+  async getKelasUserById(req, res) {
+    const { id } = req.params
+    const { id: userId } = req.user
+
+    try {
+      await this.service.validateKelasUserOwner(id, userId)
+      const response = await this.service.getKelasUserById(id)
+      return res.status(200).json({
+        status: 'success',
+        data: response
+      })
+    } catch (error) {
+      return res.status(400).json({
+        status: 'message',
+        message: error.message
+      })
+    }
+  }
 }
 
 module.exports = KelasUsersController

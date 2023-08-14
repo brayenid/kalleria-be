@@ -17,7 +17,7 @@ class KelasController {
     const thumbnailKelas = getUrlPath(req.file, 6, 9)
 
     try {
-      const id = `kelas-${generateId(10)}`
+      const id = `kelas-${generateId(20)}`
 
       const destinationPath = path.resolve(__dirname, '..', '..', 'public', 'uploads', 'kelas')
 

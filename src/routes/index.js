@@ -30,6 +30,7 @@ const { absenValidator } = require('../middlewares/Absen/AbsenValidator')
 const UserService = require('../services/UserService')
 const AdminService = require('../services/AdminService')
 const SudoService = require('../services/SudoService')
+const { sertifikatController } = require('../controllers/Sertifikat')
 
 // SERVICE INSTANCES
 const userService = new UserService()
@@ -107,10 +108,18 @@ router.put('/kelasuser/:id', validateAuthAdmin.validate, putKelasUserValidator, 
 router.delete('/kelasuser/:id', validateAuthAdmin.validate, kelasUsersController.deleteKelasUser)
 router.get('/kelasuser', validateAuthAdmin.validate, kelasUsersController.getAllKelasUsers)
 router.get('/kelasuser/user', validateAuthUser.validateStrict, kelasUsersController.getKelasUsersByUserId)
+router.get('/kelasuser/:id', validateAuthUser.validateLoose, kelasUsersController.getKelasUserById)
 
 // ABSEN ROUTES
 router.post('/absen', validateAuthAdmin.validate, absenValidator, absenController.addAbsen)
 router.get('/absen', validateAuthAdmin.validate, absenController.getAbsen)
 router.get('/absen/:kelasId', validateAuthAdmin.validate, absenController.getAbsenByKelasId)
+
+// SERTIFIKAT ROUTES
+router.post('/sertifikat/claim/:id', validateAuthUser.validateLoose, sertifikatController.addSertifikat)
+router.get('/sertifikat/users', validateAuthUser.validateStrict, sertifikatController.getSertifikatByUserId)
+router.get('/sertifikat/kelasuser/:kelasUserId', validateAuthUser.validateStrict, sertifikatController.getSertifikatByUserIdAndKelasId)
+router.get('/sertifikat/:id', sertifikatController.getSertifikatById)
+router.get('/sertifikat', validateAuthAdmin.validate, sertifikatController.getSertifikat)
 
 module.exports = router

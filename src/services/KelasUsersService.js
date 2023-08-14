@@ -43,16 +43,26 @@ class KelasUsersService {
       const query = {
         text: `
         SELECT 
-        id, 
-        user_id AS "userId", 
-        kelas_id AS "kelasId", 
-        maksimal_pertemuan AS "maksimalPertemuan", 
-        presensi, 
-        created_at AS "createdAt", 
-        updated_at AS "updatedAt" 
+        kelas_users.id, 
+        kelas_users.user_id AS "userId", 
+        users.nama,
+        kelas_users.kelas_id AS "kelasId", 
+        kelas.nama_kelas AS "namaKelas",
+        kelas_users.maksimal_pertemuan AS "maksimalPertemuan", 
+        kelas_users.presensi, 
+        kelas_users.created_at AS "createdAt", 
+        kelas_users.updated_at AS "updatedAt" 
         FROM 
         kelas_users 
-        WHERE id = $1`,
+        JOIN
+        users
+        ON
+        kelas_users.user_id = users.id
+        JOIN
+        kelas
+        ON
+        kelas_users.kelas_id = kelas.id
+        WHERE kelas_users.id = $1`,
         values: [id]
       }
       const { rows } = await this._pool.query(query)
@@ -302,6 +312,41 @@ class KelasUsersService {
       await this._pool.query(query)
     } catch (error) {
       throw new Error(`Gagal menghapus kelas user: ${error.message}`)
+    }
+  }
+
+  async validateUserGraduated(id) {
+    try {
+      const query = {
+        text: 'SELECT presensi, maksimal_pertemuan AS "maksimalPertemuan" FROM kelas_users WHERE id = $1',
+        values: [id]
+      }
+
+      const { rows } = await this._pool.query(query)
+
+      const { presensi, maksimalPertemuan } = rows[0]
+
+      if (presensi < maksimalPertemuan) {
+        throw new Error('User belum lulus pada kelas ini')
+      }
+    } catch (error) {
+      throw new Error(`Gagal memvalidasi kelulusan user: ${error.message}`)
+    }
+  }
+
+  async validateKelasUserOwner(id, userId) {
+    try {
+      const query = {
+        text: 'SELECT id FROM kelas_users WHERE id = $1 AND user_id = $2',
+        values: [id, userId]
+      }
+      const { rowCount } = await this._pool.query(query)
+
+      if (!rowCount) {
+        throw new Error('Bukan pemiliki kelas user')
+      }
+    } catch (error) {
+      throw new Error(`Gagal memvalidasi kepemilikan kelas user: ${error.message}`)
     }
   }
 }

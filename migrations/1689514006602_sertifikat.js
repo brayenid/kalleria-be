@@ -6,18 +6,9 @@ exports.up = (pgm) => {
       type: 'VARCHAR(50)',
       primaryKey: true
     },
-    kelas_id: {
-      type: 'VARCHAR(30)',
-      references: '"kelas"',
-      notNull: true
-    },
-    user_id: {
-      type: 'VARCHAR(30)',
-      references: '"users"',
-      notNull: true
-    },
-    nama: {
-      type: 'TEXT',
+    kelas_user_id: {
+      type: 'VARCHAR(40)',
+      references: '"kelas_users"',
       notNull: true
     },
     created_at: {

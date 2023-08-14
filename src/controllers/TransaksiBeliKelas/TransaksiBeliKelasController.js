@@ -151,7 +151,7 @@ class TransaksiBeliKelasController {
       let responseMessage = 'Status transaksi beli kelas berhasil diubah'
 
       if (status === 'diterima' && isKelasUsersAvailable) {
-        const kelasUsersId = `kelasuser-${generateId(20)}`
+        const kelasUsersId = `kelasuser-${generateId(30)}`
         const kelasUsersPayload = {
           id: kelasUsersId,
           userId,

@@ -13,7 +13,7 @@ class AdminControllers {
     const { username, nama, password } = req.body
     const usernameReplace = username.trim().replace(/\s/g, '')
     const payload = {
-      id: `admin-${generateId(12)}`,
+      id: `admin-${generateId(20)}`,
       username: usernameReplace,
       nama,
       password: await bcrypt.hash(password, 10)

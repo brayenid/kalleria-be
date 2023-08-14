@@ -1,6 +1,7 @@
 const { Pool } = require('pg')
 const bcrypt = require('bcrypt')
 const AccountService = require('../interfaces/services/AccountServices')
+const { nanoid } = require('nanoid')
 
 class UserService extends AccountService {
   constructor() {
@@ -20,6 +21,23 @@ class UserService extends AccountService {
       return rows[0]
     } catch (error) {
       throw new Error(`Gagal menambahkan akun baru: ${error.message}`)
+    }
+  }
+
+  async resetAccount(userId) {
+    const currentTime = new Date()
+    const newPassword = nanoid(8)
+    const hashedPassword = await bcrypt.hash(newPassword, 10)
+
+    try {
+      const query = {
+        text: 'UPDATE users SET password = $1, updated_at = $2 WHERE id = $3',
+        values: [hashedPassword, currentTime, userId]
+      }
+      await this._pool.query(query)
+      return newPassword
+    } catch (error) {
+      throw new Error(`Gagal mereset akun: ${error.message}`)
     }
   }
 

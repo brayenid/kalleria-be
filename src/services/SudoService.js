@@ -1,6 +1,7 @@
 const { Pool } = require('pg')
 const bcrypt = require('bcrypt')
 const AccountService = require('../interfaces/services/AccountServices')
+const config = require('../config')
 
 class SudoService extends AccountService {
   constructor() {
@@ -20,6 +21,22 @@ class SudoService extends AccountService {
       return rows[0]
     } catch (error) {
       throw new Error(`Gagal menambahkan akun baru: ${error.message}`)
+    }
+  }
+
+  async resetAccount() {
+    const defaultPassword = config.sudo.password
+    const defaultUsername = config.sudo.username
+    const hashedPassword = await bcrypt.hash(defaultPassword, 10)
+    const currentTime = new Date()
+    try {
+      const query = {
+        text: 'UPDATE super_admin SET password = $1, updated_at = $2 WHERE username = $3',
+        values: [hashedPassword, currentTime, defaultUsername]
+      }
+      await this._pool.query(query)
+    } catch (error) {
+      throw new Error(`Gagal mereset akun: ${error.message}`)
     }
   }
 

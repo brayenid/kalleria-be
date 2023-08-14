@@ -5,10 +5,11 @@ const { generateId } = require('../../utils/IdGenerator')
 const { getUrlPath } = require('../../utils/ImgHelper')
 
 class TransaksiBeliKelasController {
-  constructor(service, kelasService, kelasUsersService) {
+  constructor(service, kelasService, kelasUsersService, userService) {
     this.service = service
     this.kelasService = kelasService
     this.kelasUsersService = kelasUsersService
+    this.userService = userService
 
     autoBind(this)
   }
@@ -35,6 +36,48 @@ class TransaksiBeliKelasController {
       return res.status(201).json({
         status: 'success',
         message: 'Transaksi berhasil dibuat, silahkan selesaikan pembayaran'
+      })
+    } catch (error) {
+      return res.status(400).json({
+        status: 'fail',
+        message: error.message
+      })
+    }
+  }
+
+  async addTransaksiBeliKelasTunai(req, res) {
+    const { userId, kelasId, maksimalPertemuan } = req.body
+    const { id: adminId } = req.user
+    const id = `transaksi-${generateId(24)}`
+    try {
+      await this.userService.getAccountById(userId)
+      const isKelasAvailable = await this.kelasService.getKelasById(kelasId)
+      if (!isKelasAvailable) {
+        throw new Error('Gagal menambahkan transaksi: Kelas tidak tersedia')
+      }
+
+      await this.service.validateTransaksiUserAvailability(userId, kelasId)
+
+      const payload = {
+        id,
+        userId,
+        kelasId,
+        adminId
+      }
+      await this.service.addTransaksiTunai(payload)
+
+      const kelasUsersId = `kelasuser-${generateId(20)}`
+      const kelasUsersPayload = {
+        id: kelasUsersId,
+        userId,
+        kelasId,
+        maksimalPertemuan
+      }
+      await this.kelasUsersService.addKelasUser(kelasUsersPayload)
+
+      return res.status(201).json({
+        status: 'success',
+        message: 'Transaksi tunai berhasil dilakukan'
       })
     } catch (error) {
       return res.status(400).json({

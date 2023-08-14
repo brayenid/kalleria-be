@@ -33,6 +33,25 @@ class AdminControllers {
     }
   }
 
+  async resetAdmin(req, res) {
+    const { adminId } = req.body
+
+    try {
+      await this.service.getAccountById(adminId)
+      const response = await this.service.resetAccount(adminId)
+
+      return res.status(200).json({
+        status: 'success',
+        data: response
+      })
+    } catch (error) {
+      return res.status(400).json({
+        status: 'fail',
+        message: error.message
+      })
+    }
+  }
+
   async patchAdminDetailInfo(req, res) {
     const { id } = req.user
     try {

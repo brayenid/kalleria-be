@@ -44,11 +44,30 @@ class UserController {
     }
   }
 
+  async resetUser(req, res) {
+    const { userId } = req.body
+
+    try {
+      await this.service.getAccountById(userId)
+      const response = await this.service.resetAccount(userId)
+
+      return res.status(200).json({
+        status: 'success',
+        data: response
+      })
+    } catch (error) {
+      return res.status(400).json({
+        status: 'fail',
+        message: error.message
+      })
+    }
+  }
+
   async patchUserDetailInfo(req, res) {
     const { id } = req.user
     try {
       // const getUrlPath = (fullPath) => fullPath.path.split('/').splice(6, 9).join('/')
-
+      await this.service.getAccountById(id)
       const { nama, alamat, email, noTelepon, asalSekolah, noIdentitas, jenisKelamin, tanggalLahir, tempatLahir } = req.body
       let urlFoto
       if (req.file) {
@@ -93,6 +112,7 @@ class UserController {
     const { password, newPassword } = req.body
 
     try {
+      await this.service.getAccountById(id)
       await this.service.verifyAccountCredential(username, password)
       const hashedPassword = await bcrypt.hash(newPassword, 10)
       await this.service.patchAccountPassword(id, hashedPassword)

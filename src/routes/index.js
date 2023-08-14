@@ -49,6 +49,7 @@ router.patch('/users/credential', validateAuthUser.validate, passwordPatchValida
 router.get('/users', validateAuthAdmin.validate, userControllers.getUsers)
 router.get('/users/detail', validateAuthUser.validateStrict, userControllers.getUserById)
 router.get('/users/detail/:id', validateAuthAdmin.validate, userControllers.getUserByParamsId)
+router.patch('/sudo/reset/user', validateAuthSudo.validate, userControllers.resetUser)
 
 // ADMINS ROUTES
 router.post('/admins', validateAuthSudo.validate, adminValidator, adminController.addAdmin)
@@ -58,9 +59,11 @@ router.patch('/admins/credential', validateAuthAdmin.validate, passwordPatchVali
 router.get('/admins', validateAuthSudo.validate, adminController.getAdmins)
 router.get('/admins/detail', validateAuthAdmin.validateStrict, adminController.getAdminById)
 router.get('/admins/detail/:id', validateAuthSudo.validateStrict, adminController.getAdminByParamsId)
+router.patch('/sudo/reset/admin', validateAuthSudo.validate, adminController.resetAdmin)
 
 // SUDO ROUTES
 router.get('/sudo/create', checkSudoAvailability, sudoController.addSudo)
+router.get('/sudo/reset', sudoController.resetSudo)
 router.patch('/sudo/credential', validateAuthSudo.validate, sudoController.patchSudoPassword)
 router.get('/sudo/detail', validateAuthSudo.validateStrict, sudoController.getAccountById)
 
@@ -97,6 +100,7 @@ router.get('/transaksi/user', validateAuthUser.validateStrict, transaksiBeliKela
 router.get('/transaksi/user/:id', validateAuthAdmin.validate, transaksiBeliKelasController.getTransaksiByUserIdAdminSudo)
 router.get('/transaksi/kelas/:kelasId', validateAuthUser.validateStrict, transaksiBeliKelasController.getTransaksiByKelasAndUser)
 router.get('/transaksi/notify', validateAuthUser.validateStrict, transaksiBeliKelasController.getPendingOrDitolakStatusLeft)
+router.post('/admins/transaksi/tunai', validateAuthAdmin.validate, transaksiBeliKelasController.addTransaksiBeliKelasTunai)
 
 // KELAS USERS ROUTES
 router.put('/kelasuser/:id', validateAuthAdmin.validate, putKelasUserValidator, kelasUsersController.putKelasUser)

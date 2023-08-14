@@ -20,6 +20,28 @@ class TransaksiBeliKelasService {
     }
   }
 
+  async addTransaksiTunai(payload) {
+    const { id, userId, kelasId, adminId } = payload
+    const status = 'diterima'
+    const bukitBayar = 'tunai'
+    const currentTime = new Date()
+    try {
+      const query = {
+        text: `
+        INSERT INTO 
+        transaksi_beli_kelas (id, user_id, kelas_id, status, url_bukti_bayar, accepted_by, created_at, updated_at) 
+        VALUES($1, $2, $3, $4, $5, $6, $7, $7) 
+        RETURNING id`,
+        values: [id, userId, kelasId, status, bukitBayar, adminId, currentTime]
+      }
+
+      const { rows } = await this._pool.query(query)
+      return rows[0]
+    } catch (error) {
+      throw new Error(`Gagal melakukan transaksi beli kelas: ${error.message}`)
+    }
+  }
+
   async patchBuktiTransaksi(id, urlBuktiBayar) {
     const currentTime = new Date()
     try {

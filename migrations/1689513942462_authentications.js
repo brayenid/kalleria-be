@@ -10,7 +10,7 @@ exports.up = (pgm) => {
       type: 'VARCHAR(30)'
     },
     created_at: {
-      type: 'TIMESTAMP',
+      type: 'TIMESTAMPTZ',
       notNull: true,
       default: pgm.func('current_timestamp')
     }

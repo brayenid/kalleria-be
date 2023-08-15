@@ -27,12 +27,12 @@ exports.up = (pgm) => {
       default: 0
     },
     created_at: {
-      type: 'TIMESTAMP',
+      type: 'TIMESTAMPTZ',
       notNull: true,
       default: pgm.func('current_timestamp')
     },
     updated_at: {
-      type: 'TIMESTAMP',
+      type: 'TIMESTAMPTZ',
       notNull: true,
       default: pgm.func('current_timestamp')
     }

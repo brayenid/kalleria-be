@@ -24,12 +24,12 @@ exports.up = (pgm) => {
       default: 'sudo'
     },
     created_at: {
-      type: 'TIMESTAMP',
+      type: 'TIMESTAMPTZ',
       notNull: true,
       default: pgm.func('current_timestamp')
     },
     updated_at: {
-      type: 'TIMESTAMP',
+      type: 'TIMESTAMPTZ',
       notNull: true,
       default: pgm.func('current_timestamp')
     }

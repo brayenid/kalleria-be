@@ -228,6 +228,8 @@ class KelasUsersService {
         ON
         kelas_users.kelas_id = kelas.id
         WHERE users.username ILIKE $3 OR users.nama ILIKE $3 OR kelas.nama_kelas ILIKE $3
+        ORDER BY
+        kelas_users.updated_at DESC
         LIMIT $1 OFFSET $2
         `,
         values: [pageSize, offset, `%${search}%`]

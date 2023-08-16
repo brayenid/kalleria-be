@@ -7,7 +7,7 @@ exports.userValidator = [
   body('username')
     .notEmpty()
     .withMessage('Username tidak boleh kosong')
-    .matches(/^[a-zA-Z0-9_]*$/)
+    .matches(/^[a-zA-Z0-9_.]*$/)
     .withMessage('Username tidak boleh mengandung karakter spesial')
     .custom(async (username) => {
       await userService.getAccountByUsername(username)

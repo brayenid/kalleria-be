@@ -118,9 +118,9 @@ class KelasController {
   }
 
   async getAllKelas(req, res) {
-    const { pageNumber, pageSize } = req.query
+    const { pageNumber, pageSize, search } = req.query
     try {
-      const data = await this.service.getAllKelas(pageNumber, pageSize)
+      const data = await this.service.getAllKelas(pageNumber, pageSize, search)
       return res.status(200).json({
         status: 'success',
         data

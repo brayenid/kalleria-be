@@ -49,7 +49,7 @@ class KelasService {
     }
   }
 
-  async getAllKelas(pageNumber = 1, pageSize = 10) {
+  async getAllKelas(pageNumber = 1, pageSize = 10, search = '') {
     const offset = (pageNumber - 1) * pageSize
     try {
       const query = {
@@ -62,13 +62,14 @@ class KelasService {
         thumbnail_kelas AS "thumbnailKelas" 
         FROM 
         kelas
+        WHERE nama_kelas ILIKE $3 OR tipe_kelas ILIKE $3
         ORDER BY
         updated_at DESC
         LIMIT $1 OFFSET $2`,
-        values: [pageSize, offset]
+        values: [pageSize, offset, `%${search}%`]
       }
       const { rows } = await this._pool.query(query)
-      const total = await this._getAllKelasTotal()
+      const total = await this._getAllKelasTotal(search)
       return {
         total,
         rows
@@ -78,8 +79,14 @@ class KelasService {
     }
   }
 
-  async _getAllKelasTotal() {
-    const query = 'SELECT COUNT(*) AS "totalKelas" FROM kelas'
+  async _getAllKelasTotal(search) {
+    const query = {
+      text: `
+      SELECT COUNT(*) AS "totalKelas" 
+      FROM kelas 
+      WHERE nama_kelas ILIKE $1 OR tipe_kelas ILIKE $1`,
+      values: [`%${search}%`]
+    }
     const { rows } = await this._pool.query(query)
 
     return Number(rows[0].totalKelas)

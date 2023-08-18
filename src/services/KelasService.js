@@ -62,7 +62,7 @@ class KelasService {
         thumbnail_kelas AS "thumbnailKelas" 
         FROM 
         kelas
-        WHERE nama_kelas ILIKE $3 OR tipe_kelas ILIKE $3
+        WHERE nama_kelas ILIKE $3 OR tipe_kelas ILIKE $3 OR id ILIKE $3
         ORDER BY
         updated_at DESC
         LIMIT $1 OFFSET $2`,
